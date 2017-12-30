@@ -1,0 +1,95 @@
+<!--
+The MIT License
+
+Copyright (c) 2009-2011, Timothy Bingaman
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+  <!--<j:if test="${section.name.length() > 0 and !section.hasStyle()}">
+    <h2><j:out value="${app.markupFormatter.translate(section.name)}"/></h2>
+  </j:if>
+    <table style="border: none; margin: 0; padding: 0;">
+      <tr>
+        <td>
+          <div class="${section.style.cssClass}">
+            <j:if test="${section.name.length() > 0 and section.hasStyle()}">
+              <h3><j:out value="${app.markupFormatter.translate(section.name)}"/></h3>
+            </j:if>
+            <div style="white-space: normal"><j:out value="${app.markupFormatter.translate(section.text)}"/></div>
+          </div>
+        </td>
+      </tr>
+    </table>-->
+  <style>
+    .parent_div {
+    width:150px;
+    height:300px;
+    margin-right:10px;
+    float:left;
+    background-color:#5a90e8;
+    }
+
+    .parent_div_2{
+      width:100px;
+      height:300px;
+      margin-right:10px;
+      float:left;
+    }
+    .child_div_1{
+    margin:auto;
+    background-color:#e3e9f2;
+    }
+    .center {
+    margin: auto;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    padding: 10px;
+    transform: translate(-50%, -50%);
+    }
+  </style>
+  <div class=' parent_div_2'>
+    Pre Build Stage
+  </div>
+
+  <div class='parent_div'>
+    <div class ='center child_div_1'>
+      <button type="button" onclick="alert('Hello world!')">Create Hook</button>
+    </div>
+  </div>
+  <div class=' parent_div_2'>
+    Post Build Stage
+  </div>
+  <div class='parent_div'>
+    <div class ='center child_div_1'>
+      <button type="button" onclick="alert('Hello world!')">Create Hook</button>
+    </div>
+
+  </div>
+  <div class='parent_div_2'>
+    Post Test Stage
+  </div>
+  <div class='parent_div'>
+    <div class ='center child_div_1'>
+      <button type="button" onclick="alert('Hello world!')">Create Hook</button>
+    </div>
+  </div>
+</j:jelly>
