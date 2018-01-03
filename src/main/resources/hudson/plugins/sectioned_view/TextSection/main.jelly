@@ -39,6 +39,8 @@ THE SOFTWARE.
       </tr>
     </table>-->
   <style>
+    .pane-frame{float:left
+    }
     .parent_div {
     width:150px;
     height:300px;
@@ -80,7 +82,7 @@ THE SOFTWARE.
   </div>
   <div class='parent_div'>
     <div class ='center child_div_1'>
-      <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/">Create Hook</a>
+      <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook1/build/">Create Hook</a>
     </div>
 
   </div>
@@ -89,7 +91,7 @@ THE SOFTWARE.
   </div>
   <div class='parent_div'>
     <div class ='center child_div_1'>
-      <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/">Create Hook</a>
+      <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook1/build/">Create Hook</a>
     </div>
   </div>
 </j:jelly>
