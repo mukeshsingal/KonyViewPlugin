@@ -72,7 +72,7 @@ THE SOFTWARE.
 
   <div class='parent_div'>
     <div class ='center child_div_1'>
-      <button type="button" onclick="alert('Hello world!')">Create Hook</button>
+      <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/">Create Hook</a>
     </div>
   </div>
   <div class=' parent_div_2'>
@@ -80,7 +80,7 @@ THE SOFTWARE.
   </div>
   <div class='parent_div'>
     <div class ='center child_div_1'>
-      <button type="button" onclick="alert('Hello world!')">Create Hook</button>
+      <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/">Create Hook</a>
     </div>
 
   </div>
@@ -89,7 +89,7 @@ THE SOFTWARE.
   </div>
   <div class='parent_div'>
     <div class ='center child_div_1'>
-      <button type="button" onclick="alert('Hello world!')">Create Hook</button>
+      <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/">Create Hook</a>
     </div>
   </div>
 </j:jelly>
