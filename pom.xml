@@ -48,7 +48,7 @@
   </pluginRepositories>
 
   <properties>
-    <jenkins.version>2.63</jenkins.version>
+    <jenkins.version>2.7.2</jenkins.version>
     <java.version>7</java.version>
     <findbugs.failOnError>false</findbugs.failOnError>
   </properties>
