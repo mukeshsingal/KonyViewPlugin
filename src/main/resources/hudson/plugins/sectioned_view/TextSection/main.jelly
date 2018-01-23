@@ -45,21 +45,25 @@ THE SOFTWARE.
       <meta charset="utf-8"/>
       <meta name="viewport" content="width=device-width, initial-scale=1"/>
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-      <link rel="stylesheet" href="${rootURL}/plugin/sectioned-view/app-factory/css/fontface/fontface.css"/>
-      <link rel="stylesheet" href="${rootURL}/plugin/sectioned-view/app-factory/css/styles.css"/>
-      <link rel="stylesheet" href="${rootURL}/plugin/sectioned-view/app-factory/css/theme.css"/>
+      <link rel="stylesheet" href="${rootURL}/plugin/KonyCustomView/app-factory/css/fontface/fontface.css"/>
+      <link rel="stylesheet" href="${rootURL}/plugin/KonyCustomView/app-factory/css/styles.css"/>
+      <link rel="stylesheet" href="${rootURL}/plugin/KonyCustomView/app-factory/css/theme.css"/>
 
-      <script src="${rootURL}/plugin/sectioned-view/app-factory/js/jquery.min.js"></script>
-      <script src="${rootURL}/plugin/sectioned-view/app-factory/js/jquery-ui.js"></script>
+      <script src="${rootURL}/plugin/KonyCustomView/app-factory/js/jquery.min.js"></script>
+      <script src="${rootURL}/plugin/KonyCustomView/app-factory/js/jquery-ui.js"></script>
       <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
-      <script src="${rootURL}/plugin/sectioned-view/app-factory/js/bootstrap.min.js"></script>
+      <script src="${rootURL}/plugin/KonyCustomView/app-factory/js/bootstrap.min.js"></script>
+      <script>
+        $(document).ready(function(){
+        $('.app-factory').parent().parent().css('clear','none');
+        });
+      </script>
     </head>
     <body>
-
       <section class="app-factory">
         <div class="container-fluid">
           <div class="row">
-            <div class="col-sm-9 main-content max-width mb-30">
+            <div class="col-sm-12 main-content max-width mb-30">
               <section class="main-content-panel">
                 <section class="custom-hook mt-50 ml-50">
                   <div class="row">
@@ -108,146 +112,53 @@ THE SOFTWARE.
                       </div>
                     </div>
                     <div class="w-100 mt-5">
-                      <ul class="connector">
-                        <li class="arrow-left"></li>
-                        <li class="arrow-right"></li>
-                        <li class="arrow-left"></li>
-                        <li class="arrow-right"></li>
-                        <li class="arrow-left"></li>
-                        <li class="arrow-right"></li>
+                      <ul class="connector" style="padding-left:25px;">
+                        <li class="arrow-left" style="width: 135px;"></li>
+                        <li class="arrow-right" style="width: 135px;"></li>
+                        <li class="arrow-left" style="width: 135px;"></li>
+                        <li class="arrow-right" style="width: 135px;"></li>
+                        <li class="arrow-left" style="width: 135px;"></li>
+                        <li class="arrow-right" style="width: 135px;"></li>
                       </ul>
 
                     </div>
                   </div>
                   <div class="row">
                     <div class="p-0">
-                      <div class="hook-point-container">
+                      <div class="hook-point-container" style="width: 265px">
                         <div class="hook-header">
                           <span class="label-header" >Hook Point PreBuild</span>
-                          <button type="button" class="btn btn-upload show-modal" data-toggle="modal">Upload</button>
+                          <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/">
+                            <button type="button" class="btn btn-upload show-modal" data-toggle="modal">Upload</button>
+                          </a>
                         </div>
                         <div class="hook-added">
                           <ul class="sortable hook-items" >
-                            <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                              <span class="normal-state">
-                                <span class="hook-label" >Check Formatting</span>
-                                <span class="hook-edit d-none" ><input type="text" value=""/></span>
-                                <span class="action-icons pull-right ">
-                                  <span class="icon-set d-none">
-                                    <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-disable-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-disable-set d-none">
-                                    <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-delete-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-edit-set d-none">
-                                    <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-cancel-hook v-middle di-block"></i>
-                                  </span>
-                                </span>
-                              </span>
-                            </li>
-                            <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                              <span class="normal-state">
-                                <span class="hook-label">Validate Standards</span>
-                                <span class="hook-edit d-none" ><input type="text" value=""/></span>
-                                <span class="action-icons pull-right ">
-                                  <span class="icon-set d-none">
-                                    <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-disable-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-disable-set d-none">
-                                    <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-delete-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-edit-set d-none">
-                                    <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-cancel-hook v-middle di-block"></i>
+
+                            <!--Add Custom Hook shown logic here -->
+                            <j:forEach var="hook" items="${section.getCustomHookPreBuildList()}">
+                              <!--<j:out value="${section.getElement()}"/>-->
+                              <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                                <span class="normal-state">
+                                  <span class="hook-label" >${hook}</span>
+                                  <span class="hook-edit d-none" ><input type="text" value=""/></span>
+                                  <span class="action-icons pull-right ">
+                                    <span class="icon-set d-none">
+                                      <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
+                                      <i class="icon16 icon-disable-hook v-middle di-block"></i>
+                                    </span>
+                                    <span class="icon-disable-set d-none">
+                                      <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
+                                      <i class="icon16 icon-delete-hook v-middle di-block"></i>
+                                    </span>
+                                    <span class="icon-edit-set d-none">
+                                      <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
+                                      <i class="icon16 icon-cancel-hook v-middle di-block"></i>
+                                    </span>
                                   </span>
                                 </span>
-                              </span>
-                            </li>
-                            <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                              <span class="normal-state">
-                                <span class="hook-label">Validate Test</span>
-                                <span class="hook-edit d-none" ><input type="text" value=""/></span>
-                                <span class="action-icons pull-right ">
-                                  <span class="icon-set d-none">
-                                    <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-disable-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-disable-set d-none">
-                                    <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-delete-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-edit-set d-none">
-                                    <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-cancel-hook v-middle di-block"></i>
-                                  </span>
-                                </span>
-                              </span>
-                            </li>
-                            <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                              <span class="normal-state">
-                                <span class="hook-label">Validate Data</span>
-                                <span class="hook-edit d-none" ><input type="text" value=""/></span>
-                                <span class="action-icons pull-right ">
-                                  <span class="icon-set d-none">
-                                    <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-disable-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-disable-set d-none">
-                                    <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-delete-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-edit-set d-none">
-                                    <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-cancel-hook v-middle di-block"></i>
-                                  </span>
-                                </span>
-                              </span>
-                            </li>
-                            <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                              <span class="normal-state">
-                                <span class="hook-label">Validate Test 1</span>
-                                <span class="hook-edit d-none" ><input type="text" value=""/></span>
-                                <span class="action-icons pull-right ">
-                                  <span class="icon-set d-none">
-                                    <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-disable-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-disable-set d-none">
-                                    <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-delete-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-edit-set d-none">
-                                    <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-cancel-hook v-middle di-block"></i>
-                                  </span>
-                                </span>
-                              </span>
-                            </li>
-                            <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                              <span class="normal-state">
-                                <span class="hook-label">Validate Test 2</span>
-                                <span class="hook-edit d-none" ><input type="text" value=""/></span>
-                                <span class="action-icons pull-right ">
-                                  <span class="icon-set d-none">
-                                    <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-disable-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-disable-set d-none">
-                                    <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-delete-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-edit-set d-none">
-                                    <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-cancel-hook v-middle di-block"></i>
-                                  </span>
-                                </span>
-                              </span>
-                            </li>
+                              </li>
+                            </j:forEach>
                           </ul>
                           <div class="no-hook d-none">
                             <div class="inner-content">
@@ -265,16 +176,19 @@ THE SOFTWARE.
                           </div>
                         </div>
                       </div>
-                      <div class="hook-point-container">
+                      <div class="hook-point-container" style="width: 265px">
                         <div class="hook-header">
                           <span class="label-header">Hook Point PostBuild</span>
+                          <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/">
                           <button type="button" class="btn btn-upload show-modal">Upload</button>
+                          </a>
                         </div>
                         <div class="hook-added">
                           <ul class="sortable hook-items" >
+                            <j:forEach var="hook" items="${section.getCustomHookPostBuildList()}">
                             <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
                               <span class="normal-state">
-                                <span class="hook-label" >Run SonarCube</span>
+                                <span class="hook-label" >${hook}</span>
                                 <span class="hook-edit d-none" ><input type="text" value=""/></span>
                                 <span class="action-icons pull-right ">
                                   <span class="icon-set d-none">
@@ -292,26 +206,7 @@ THE SOFTWARE.
                                 </span>
                               </span>
                             </li>
-                            <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                              <span class="normal-state">
-                                <span class="hook-label">Run SampleTest</span>
-                                <span class="hook-edit d-none" ><input type="text" value=""/></span>
-                                <span class="action-icons pull-right ">
-                                  <span class="icon-set d-none">
-                                    <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-disable-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-disable-set d-none">
-                                    <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-delete-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-edit-set d-none">
-                                    <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-cancel-hook v-middle di-block"></i>
-                                  </span>
-                                </span>
-                              </span>
-                            </li>
+                            </j:forEach>
                           </ul>
                           <div class="no-hook d-none">
                             <div class="inner-content">
@@ -329,53 +224,37 @@ THE SOFTWARE.
                           </div>
                         </div>
                       </div>
-                      <div class="hook-point-container">
+                      <div class="hook-point-container" style="width: 265px">
                         <div class="hook-header">
                           <span class="label-header">Hook Point PostTest</span>
+                          <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/">
                           <button type="button" class="btn btn-upload show-modal">Upload</button>
+                          </a>
                         </div>
                         <div class="hook-added">
                           <ul class="sortable hook-items" >
-                            <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                              <span class="normal-state">
-                                <span class="hook-label" >Run Desktop Test</span>
-                                <span class="hook-edit d-none" ><input type="text" value=""/></span>
-                                <span class="action-icons pull-right ">
-                                  <span class="icon-set d-none">
-                                    <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-disable-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-disable-set d-none">
-                                    <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-delete-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-edit-set d-none">
-                                    <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-cancel-hook v-middle di-block"></i>
-                                  </span>
-                                </span>
-                              </span>
-                            </li>
-                            <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                              <span class="normal-state">
-                                <span class="hook-label">Run Desktop Test 1</span>
-                                <span class="hook-edit d-none" ><input type="text" value=""/></span>
-                                <span class="action-icons pull-right ">
-                                  <span class="icon-set d-none">
-                                    <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-disable-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-disable-set d-none">
-                                    <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-delete-hook v-middle di-block"></i>
-                                  </span>
-                                  <span class="icon-edit-set d-none">
-                                    <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-cancel-hook v-middle di-block"></i>
+                            <j:forEach var="hook" items="${section.getCustomHookPostTestList()}">
+                              <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                                <span class="normal-state">
+                                  <span class="hook-label" >${hook}</span>
+                                  <span class="hook-edit d-none" ><input type="text" value=""/></span>
+                                  <span class="action-icons pull-right ">
+                                    <span class="icon-set d-none">
+                                      <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
+                                      <i class="icon16 icon-disable-hook v-middle di-block"></i>
+                                    </span>
+                                    <span class="icon-disable-set d-none">
+                                      <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
+                                      <i class="icon16 icon-delete-hook v-middle di-block"></i>
+                                    </span>
+                                    <span class="icon-edit-set d-none">
+                                      <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
+                                      <i class="icon16 icon-cancel-hook v-middle di-block"></i>
+                                    </span>
                                   </span>
                                 </span>
-                              </span>
-                            </li>
+                              </li>
+                            </j:forEach>
                           </ul>
                           <div class="no-hook d-none">
                             <div class="inner-content">
@@ -438,11 +317,12 @@ THE SOFTWARE.
             </div>
           </div>
         </div>
+
       </div>
       <!-- Notification messages -->
       <div id="service-created"></div>
       <!-- Notification messages -->
-      <script src="${rootURL}/plugin/sectioned-view/app-factory/js/custom.js"></script>
+      <script src="${rootURL}/plugin/KonyCustomView/app-factory/js/custom.js"></script>
       <script>
         $( function() {
         $( ".sortable" ).sortable();

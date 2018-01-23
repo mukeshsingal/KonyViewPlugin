@@ -55,7 +55,7 @@ THE SOFTWARE.
               <div style="${section.css}">
                 <div style="padding: 5px; overflow: hidden;">
                   <st:include from="${section}" page="main.jelly"/>
-                  <div style="clear:both;"></div>
+                  <div></div>
                 </div>
               </div>
             </j:forEach>

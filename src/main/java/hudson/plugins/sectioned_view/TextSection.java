@@ -23,6 +23,10 @@
  */
 package hudson.plugins.sectioned_view;
 
+import hudson.model.Item;
+import hudson.model.Job;
+import hudson.model.TopLevelItem;
+import jenkins.model.Jenkins;
 import hudson.Extension;
 import hudson.util.EnumConverter;
 import net.sf.json.JSONObject;
@@ -30,11 +34,13 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
+import com.cloudbees.hudson.plugins.folder.Folder;
+
+import java.util.*;
 
 public class TextSection extends SectionedViewSection {
-
+    public List<String> hooks;
     private String text;
-
     private Style style;
 
     /**
@@ -82,6 +88,100 @@ public class TextSection extends SectionedViewSection {
         }
     }
 
+    public List<String> getHooks(){
+        return hooks;
+    }
+
+    public String getCustomHookPostBuildList(){
+        String name = "";
+        Jenkins instance = Jenkins.getInstance();
+
+         List<Item> itm = instance.getAllItems();
+         for(Item item : itm){
+             if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
+                 System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
+                if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook/POST_BUILD").trim())){
+                    System.out.println(" *** ");
+                    System.out.println(" -> "+item.getFullDisplayName() +"  -> " + item.toString());
+                    System.out.println(" -> "+item.getDisplayName() + " -> "+ item.toString());
+                    System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
+
+                    Object[] jobsArr = item.getAllJobs().toArray();
+                    System.out.println("arr data = " + Arrays.toString(jobsArr));
+                    for(Object job : jobsArr) {
+                        name = name +","+ ((Job) job).getDisplayName();
+                        System.out.println("----" + ((Job) job).getDisplayName());
+
+//                        System.out.println("-> Hook Added -> "+job.getDisplayName());
+//                        hooks.add(job.getDisplayName());
+                    }
+                }
+             }
+         }
+         return name;
+    }
+    public String getCustomHookPreBuildList(){
+        String name = "";
+        Jenkins instance = Jenkins.getInstance();
+
+        List<Item> itm = instance.getAllItems();
+        for(Item item : itm){
+            if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
+                System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
+                if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook/PRE_BUILD").trim())){
+                    System.out.println(" *** ");
+                    System.out.println(" -> "+item.getFullDisplayName() +"  -> " + item.toString());
+                    System.out.println(" -> "+item.getDisplayName() + " -> "+ item.toString());
+                    System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
+
+                    Object[] jobsArr = item.getAllJobs().toArray();
+                    System.out.println("arr data = " + Arrays.toString(jobsArr));
+                    for(Object job : jobsArr) {
+                        name = name +","+ ((Job) job).getDisplayName();
+                        System.out.println("----" + ((Job) job).getDisplayName());
+
+//                        System.out.println("-> Hook Added -> "+job.getDisplayName());
+//                        hooks.add(job.getDisplayName());
+                    }
+                }
+            }
+        }
+        return name;
+    }
+    public String getCustomHookPostTestList(){
+        String name = "";
+        Jenkins instance = Jenkins.getInstance();
+
+        List<Item> itm = instance.getAllItems();
+        for(Item item : itm){
+            if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
+                System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
+                if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook/POST_TEST").trim())){
+                    System.out.println(" *** ");
+                    System.out.println(" -> "+item.getFullDisplayName() +"  -> " + item.toString());
+                    System.out.println(" -> "+item.getDisplayName() + " -> "+ item.toString());
+                    System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
+
+                    Object[] jobsArr = item.getAllJobs().toArray();
+                    System.out.println("arr data = " + Arrays.toString(jobsArr));
+                    for(Object job : jobsArr) {
+                        name = name +","+ ((Job) job).getDisplayName();
+                        System.out.println("----" + ((Job) job).getDisplayName());
+
+//                        System.out.println("-> Hook Added -> "+job.getDisplayName());
+//                        hooks.add(job.getDisplayName());
+                    }
+                }
+            }
+        }
+        return name;
+    }
+
+    public String getElement(){
+        String element = "<h1>I am An Html Tag</h1>";
+        return element;
+    }
+
     /**
      * Constants that control how a Text Section is styled.
      */
@@ -107,6 +207,7 @@ public class TextSection extends SectionedViewSection {
         public String getName() {
             return name();
         }
+
 
         Style(String description, String cssClass) {
             this.description = description;
