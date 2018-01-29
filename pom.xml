@@ -35,7 +35,8 @@
 
   <properties>
     <jenkins.version>2.7.2</jenkins.version>
-    <java.version>7</java.version>
+    <java.version>8</java.version>
+    <java.level>8</java.level>
     <findbugs.failOnError>false</findbugs.failOnError>
   </properties>
 
@@ -71,9 +72,13 @@
       <artifactId>cloudbees-folder</artifactId>
       <version>6.1.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-job</artifactId>
+      <version>2.15</version>
+    </dependency>
 
   </dependencies>
-
   <build>
     <pluginManagement>
       <plugins>

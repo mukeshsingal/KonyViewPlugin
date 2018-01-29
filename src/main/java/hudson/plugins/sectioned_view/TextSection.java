@@ -23,6 +23,7 @@
  */
 package hudson.plugins.sectioned_view;
 
+import hudson.model.FreeStyleProject;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.TopLevelItem;
@@ -30,12 +31,13 @@ import jenkins.model.Jenkins;
 import hudson.Extension;
 import hudson.util.EnumConverter;
 import net.sf.json.JSONObject;
-
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.bind.JavaScriptMethod;
 import com.cloudbees.hudson.plugins.folder.Folder;
-
+import java.io.*;
 import java.util.*;
 
 public class TextSection extends SectionedViewSection {
@@ -74,6 +76,7 @@ public class TextSection extends SectionedViewSection {
         return style != Style.NONE;
     }
 
+
     @Extension
     public static final class DescriptorImpl extends SectionedViewSectionDescriptor {
 
@@ -92,6 +95,22 @@ public class TextSection extends SectionedViewSection {
         return hooks;
     }
 
+    public Job getJobOf(){
+        String name = "";
+        Jenkins instance = Jenkins.getInstance();
+
+        List<Item> itm = instance.getAllItems();
+        for(Item item : itm){
+            if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
+                if(item.getDisplayName() == "MukeshSingal"){
+
+                    return (Job) item;
+                }
+
+            }
+        }
+        return null;
+    }
     public String getCustomHookPostBuildList(){
         String name = "";
         Jenkins instance = Jenkins.getInstance();
@@ -102,6 +121,7 @@ public class TextSection extends SectionedViewSection {
                  System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
                 if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook/POST_BUILD").trim())){
                     System.out.println(" *** ");
+
                     System.out.println(" -> "+item.getFullDisplayName() +"  -> " + item.toString());
                     System.out.println(" -> "+item.getDisplayName() + " -> "+ item.toString());
                     System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
@@ -148,6 +168,25 @@ public class TextSection extends SectionedViewSection {
         }
         return name;
     }
+    @JavaScriptMethod
+    public void doDisable(){
+        System.out.println("doDisable()");
+        System.out.print("(((((((((((((((((((()))))))))))))))MukeshSingal");
+        Item job = Jenkins.getInstance().getItemByFullName("MukeshSingal");
+        if(job instanceof hudson.model.FreeStyleProject){
+            try {
+                System.out.println("--Set Disable Invoked for FS--");
+                ((FreeStyleProject) job).disable();
+            } catch(IOException ie) {
+                ie.printStackTrace();
+            }
+        }
+        if(job instanceof org.jenkinsci.plugins.workflow.job.WorkflowJob){
+            System.out.println("--Set Disable Invoked for pipeline--");
+            ((WorkflowJob) job).setDisabled(true);
+        }
+    }
+
     public String getCustomHookPostTestList(){
         String name = "";
         Jenkins instance = Jenkins.getInstance();

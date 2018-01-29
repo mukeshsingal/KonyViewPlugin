@@ -58,6 +58,9 @@ THE SOFTWARE.
         $('.app-factory').parent().parent().css('clear','none');
         });
       </script>
+      <script>
+        crumb.init("${h.getCrumbRequestField()}", "${h.getCrumb(request)}");
+      </script>
     </head>
     <body>
       <section class="app-factory">
@@ -140,15 +143,31 @@ THE SOFTWARE.
                               <!--<j:out value="${section.getElement()}"/>-->
                               <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
                                 <span class="normal-state">
+                                  <a class="btn-link" href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/build/">
                                   <span class="hook-label" >${hook}</span>
-                                  <span class="hook-edit d-none" ><input type="text" value=""/></span>
+                                  </a>
+
+                                  <!--<span class="hook-edit d-none" ><input type="text" value=""/></span>-->
                                   <span class="action-icons pull-right ">
                                     <span class="icon-set d-none">
-                                      <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
-                                      <i class="icon16 icon-disable-hook v-middle di-block"></i>
+                                      <!--<i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>-->
+
+                                      <j:set var="preBuildHookDisableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/disable"/>
+                                      <j:set var="preBuildDisableHook" value="javascript:new Ajax.Request('${preBuildHookDisableRequest}', {method: 'post'});"/>
+                                      <a onclick="${preBuildDisableHook}">
+                                        <i class="icon16 icon-disable-hook v-middle di-block"></i>
+                                      </a>
                                     </span>
                                     <span class="icon-disable-set d-none">
-                                      <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
+
+                                      <j:set var="preBuildEnableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/enable"/>
+                                      <j:set var="preBuildEnableHook" value="javascript:new Ajax.Request('${preBuildEnableRequest}', {method: 'post'});"/>
+                                      <a onclick="${preBuildEnableHook}">
+                                        <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
+                                      </a>
+
+                                      <j:set var="preBuildDeleteRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/doDelete"/>
+                                      <j:set var="preBuildDeleteHook" value="javascript:new Ajax.Request('${preBuildDeleteRequest}', {method: 'post'});"/>
                                       <i class="icon16 icon-delete-hook v-middle di-block"></i>
                                     </span>
                                     <span class="icon-edit-set d-none">
@@ -162,7 +181,7 @@ THE SOFTWARE.
                           </ul>
                           <div class="no-hook d-none">
                             <div class="inner-content">
-                              <p class="text-black">No Hook(s) available, please <a href="javascript:void(0);" class="show-modal">Upload</a></p>
+
                             </div>
                           </div>
                         </div>
@@ -171,7 +190,7 @@ THE SOFTWARE.
                             <p class="text-white">Do you want to delete selected "Hook"?</p>
                             <div class="btn-container">
                               <a href="javascript:void();" class="button-over cancel-delete button-over mr-5"> Cancel </a>
-                              <button type="button" class="btn btn-primary-m delete-confirm">Yes</button>
+                              <button type="button" class="btn btn-primary-m delete-confirm" onclick="${preBuildDeleteHook}">Yes</button>
                             </div>
                           </div>
                         </div>
@@ -188,16 +207,32 @@ THE SOFTWARE.
                             <j:forEach var="hook" items="${section.getCustomHookPostBuildList()}">
                             <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
                               <span class="normal-state">
+                                <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_BUILD/job/${hook}/build/">
                                 <span class="hook-label" >${hook}</span>
+                                </a>
+
                                 <span class="hook-edit d-none" ><input type="text" value=""/></span>
                                 <span class="action-icons pull-right ">
                                   <span class="icon-set d-none">
-                                    <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
-                                    <i class="icon16 icon-disable-hook v-middle di-block"></i>
+
+                                    <!--<i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>-->
+                                    <j:set var="disableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_BUILD/job/${hook}/disable"/>
+                                    <j:set var="disableHook" value="javascript:new Ajax.Request('${disableRequest}', {method: 'post'});"/>
+                                    <a onclick="${disableHook}">
+                                      <i class="icon16 icon-disable-hook v-middle di-block"></i>
+                                    </a>
                                   </span>
                                   <span class="icon-disable-set d-none">
-                                    <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
+                                    <j:set var="enableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_BUILD/job/${hook}/enable"/>
+                                    <j:set var="enableHook" value="javascript:new Ajax.Request('${enableRequest}', {method: 'post'});"/>
+                                    <a onclick="${enableHook}">
+                                      <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
+                                    </a>
+
+                                    <j:set var="deleteRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_BUILD/job/${hook}/doDelete"/>
+                                    <j:set var="deleteHook" value="javascript:new Ajax.Request('${deleteRequest}', {method: 'post'});"/>
                                     <i class="icon16 icon-delete-hook v-middle di-block"></i>
+
                                   </span>
                                   <span class="icon-edit-set d-none">
                                     <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
@@ -210,7 +245,6 @@ THE SOFTWARE.
                           </ul>
                           <div class="no-hook d-none">
                             <div class="inner-content">
-                              <p class="text-black">No Hook(s) available, please <a href="javascript:void(0);" class="show-modal">Upload</a></p>
                             </div>
                           </div>
                         </div>
@@ -219,7 +253,7 @@ THE SOFTWARE.
                             <p class="text-white">Do you want to delete selected "Hook"?</p>
                             <div class="btn-container">
                               <a href="javascript:void();" class="button-over cancel-delete button-over mr-5"> Cancel </a>
-                              <button type="button" class="btn btn-primary-m delete-confirm">Yes</button>
+                              <button type="button" class="btn btn-primary-m delete-confirm" onclick="${deleteHook}">Yes</button>
                             </div>
                           </div>
                         </div>
@@ -236,15 +270,29 @@ THE SOFTWARE.
                             <j:forEach var="hook" items="${section.getCustomHookPostTestList()}">
                               <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
                                 <span class="normal-state">
+                                  <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_TEST/job/${hook}/build/">
                                   <span class="hook-label" >${hook}</span>
+                                  </a>
                                   <span class="hook-edit d-none" ><input type="text" value=""/></span>
                                   <span class="action-icons pull-right ">
                                     <span class="icon-set d-none">
-                                      <i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>
-                                      <i class="icon16 icon-disable-hook v-middle di-block"></i>
+                                      <!--<i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>-->
+
+                                      <j:set var="postTestDisableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_TEST/job/${hook}/disable"/>
+                                      <j:set var="postTestDisableHook" value="javascript:new Ajax.Request('${postTestDisableRequest}', {method: 'post'});"/>
+                                      <a onclick="${postTestDisableHook}">
+                                        <i class="icon16 icon-disable-hook v-middle di-block"></i>
+                                      </a>
                                     </span>
                                     <span class="icon-disable-set d-none">
-                                      <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
+                                      <j:set var="postTestEnableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_TEST/job/${hook}/enable"/>
+                                      <j:set var="postTestEnableHook" value="javascript:new Ajax.Request('${postTestEnableRequest}', {method: 'post'});"/>
+                                      <a onclick="${postTestEnableHook}">
+                                        <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
+                                      </a>
+
+                                      <j:set var="postTestDeleteRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_TEST/job/${hook}/doDelete"/>
+                                      <j:set var="postTestDeleteHook" value="javascript:new Ajax.Request('${postTestDeleteRequest}', {method: 'post'});"/>
                                       <i class="icon16 icon-delete-hook v-middle di-block"></i>
                                     </span>
                                     <span class="icon-edit-set d-none">
@@ -258,7 +306,7 @@ THE SOFTWARE.
                           </ul>
                           <div class="no-hook d-none">
                             <div class="inner-content">
-                              <p class="text-black">No Hook(s) available, please <a href="javascript:void(0);" class="show-modal">Upload</a></p>
+
                             </div>
                           </div>
                         </div>
@@ -267,7 +315,7 @@ THE SOFTWARE.
                             <p class="text-white">Do you want to delete selected "Hook"?</p>
                             <div class="btn-container">
                               <a href="javascript:void();" class="button-over cancel-delete button-over mr-5"> Cancel </a>
-                              <button type="button" class="btn btn-primary-m delete-confirm">Yes</button>
+                              <button type="button" class="btn btn-primary-m delete-confirm" onclick="${postTestDeleteHook}">Yes</button>
                             </div>
                           </div>
                         </div>
@@ -323,7 +371,9 @@ THE SOFTWARE.
       <div id="service-created"></div>
       <!-- Notification messages -->
       <script src="${rootURL}/plugin/KonyCustomView/app-factory/js/custom.js"></script>
+
       <script>
+
         $( function() {
         $( ".sortable" ).sortable();
         $( ".sortable" ).disableSelection();

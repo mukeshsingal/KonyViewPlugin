@@ -24,17 +24,7 @@
 package hudson.plugins.sectioned_view;
 
 import hudson.Extension;
-import hudson.model.Descriptor;
-import hudson.model.HealthReport;
-import hudson.model.Hudson;
-import hudson.model.Item;
-import hudson.model.Job;
-import hudson.model.Result;
-import hudson.model.Run;
-import hudson.model.Saveable;
-import hudson.model.TopLevelItem;
-import hudson.model.View;
-import hudson.model.ViewDescriptor;
+import hudson.model.*;
 import hudson.model.Descriptor.FormException;
 import hudson.util.DescribableList;
 
@@ -49,6 +39,9 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 
+
+import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
