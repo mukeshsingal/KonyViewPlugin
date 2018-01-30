@@ -40,6 +40,7 @@ import com.cloudbees.hudson.plugins.folder.Folder;
 import java.io.*;
 import java.util.*;
 
+
 public class TextSection extends SectionedViewSection {
     public List<String> hooks;
     private String text;
@@ -115,30 +116,43 @@ public class TextSection extends SectionedViewSection {
         String name = "";
         Jenkins instance = Jenkins.getInstance();
 
-         List<Item> itm = instance.getAllItems();
-         for(Item item : itm){
-             if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
-                 System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
+        List<Item> itm = instance.getAllItems();
+        for(Item item : itm){
+            if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
                 if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook/POST_BUILD").trim())){
-                    System.out.println(" *** ");
-
-                    System.out.println(" -> "+item.getFullDisplayName() +"  -> " + item.toString());
-                    System.out.println(" -> "+item.getDisplayName() + " -> "+ item.toString());
-                    System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
+                    System.out.println("POST_BUILD Folder Content ->");
 
                     Object[] jobsArr = item.getAllJobs().toArray();
-                    System.out.println("arr data = " + Arrays.toString(jobsArr));
+
                     for(Object job : jobsArr) {
                         name = name +","+ ((Job) job).getDisplayName();
-                        System.out.println("----" + ((Job) job).getDisplayName());
-
-//                        System.out.println("-> Hook Added -> "+job.getDisplayName());
-//                        hooks.add(job.getDisplayName());
+                        System.out.println("       Job ->"+ name);
                     }
                 }
-             }
-         }
-         return name;
+            }
+        }
+        return name;
+    }
+
+    public String hookStatus(String state, String hookName){
+        String status= "Not Available";
+        Jenkins instance = Jenkins.getInstance();
+
+        List<Item> itm = instance.getAllItems();
+        for(Item item : itm){
+            if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
+                if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook/"+state).trim())){
+                    Object[] jobsArr = item.getAllJobs().toArray();
+                    for(Object job : jobsArr) {
+                        if(((Job) job).getDisplayName().equals(hookName)) {
+                            status = String.valueOf(((Job) job).isBuildable());
+                            System.out.println("hook Status is " + hookName +"    isBuildable "+ status);
+                        }
+                    }
+                }
+            }
+        }
+        return status;
     }
     public String getCustomHookPreBuildList(){
         String name = "";
@@ -147,32 +161,28 @@ public class TextSection extends SectionedViewSection {
         List<Item> itm = instance.getAllItems();
         for(Item item : itm){
             if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
-                System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
                 if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook/PRE_BUILD").trim())){
-                    System.out.println(" *** ");
-                    System.out.println(" -> "+item.getFullDisplayName() +"  -> " + item.toString());
-                    System.out.println(" -> "+item.getDisplayName() + " -> "+ item.toString());
-                    System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
+                    System.out.println("PRE_BUILD Folder Content ->");
 
                     Object[] jobsArr = item.getAllJobs().toArray();
-                    System.out.println("arr data = " + Arrays.toString(jobsArr));
-                    for(Object job : jobsArr) {
-                        name = name +","+ ((Job) job).getDisplayName();
-                        System.out.println("----" + ((Job) job).getDisplayName());
 
-//                        System.out.println("-> Hook Added -> "+job.getDisplayName());
-//                        hooks.add(job.getDisplayName());
+                    for(Object job : jobsArr) {
+                        String hookName = ((Job) job).getDisplayName();
+                        name = name +","+ hookName;
+                        System.out.println("       Job ->"+ name + String.valueOf(((Job) job).isBuildable()));
+                        hookStatus("PRE_BUILD",hookName);
                     }
                 }
             }
         }
         return name;
     }
-    @JavaScriptMethod
-    public void doDisable(){
-        System.out.println("doDisable()");
-        System.out.print("(((((((((((((((((((()))))))))))))))MukeshSingal");
-        Item job = Jenkins.getInstance().getItemByFullName("MukeshSingal");
+
+
+
+    public void doDisable(String hookName){
+        System.out.println("doDisable("+hookName+")");
+        Item job = Jenkins.getInstance().getItemByFullName(getName() +"/Visualizer/Builds/CustomHook/PRE_BUILD"+hookName);
         if(job instanceof hudson.model.FreeStyleProject){
             try {
                 System.out.println("--Set Disable Invoked for FS--");
@@ -194,21 +204,14 @@ public class TextSection extends SectionedViewSection {
         List<Item> itm = instance.getAllItems();
         for(Item item : itm){
             if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
-                System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
                 if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook/POST_TEST").trim())){
-                    System.out.println(" *** ");
-                    System.out.println(" -> "+item.getFullDisplayName() +"  -> " + item.toString());
-                    System.out.println(" -> "+item.getDisplayName() + " -> "+ item.toString());
-                    System.out.println(" -> "+item.getFullName() + " -> "+ item.toString());
+                    System.out.println("POST_TEST Folder Content ->");
 
                     Object[] jobsArr = item.getAllJobs().toArray();
-                    System.out.println("arr data = " + Arrays.toString(jobsArr));
+
                     for(Object job : jobsArr) {
                         name = name +","+ ((Job) job).getDisplayName();
-                        System.out.println("----" + ((Job) job).getDisplayName());
-
-//                        System.out.println("-> Hook Added -> "+job.getDisplayName());
-//                        hooks.add(job.getDisplayName());
+                        System.out.println("       Job ->"+ name);
                     }
                 }
             }

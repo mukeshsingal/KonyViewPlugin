@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:g="glide" xmlns:i="jelly:fmt">
   <!--<j:if test="${section.name.length() > 0 and !section.hasStyle()}">
     <h2><j:out value="${app.markupFormatter.translate(section.name)}"/></h2>
   </j:if>
@@ -56,7 +56,28 @@ THE SOFTWARE.
       <script>
         $(document).ready(function(){
         $('.app-factory').parent().parent().css('clear','none');
+        $(".state").each( function( index, element ){
+          if($( this ).text() == "false"){
+            $(this).parent().addClass("disabled");
+            $(this).parent().removeClass("active");
+
+            $(this).siblings('.normal-state').children('.action-icons').children('.icon-set').addClass('d-none');
+            $(this).siblings('.normal-state').children('.action-icons').children('.icon-set').removeClass('icon-set');
+
+            $(this).siblings('.normal-state').children('.action-icons').children('.icon-disable-set').removeClass('d-none');
+        }
+        else( console.log("Not Hello"))
         });
+        });
+      </script>
+      <script>
+        function deleteHook(){
+        var x = $(".tempDeleteClass").text()
+        eval(x)
+        }
+        function undoDeleteHook(){
+        $(".tempDeleteClass").removeClass("tempDeleteClass")
+        }
       </script>
       <script>
         crumb.init("${h.getCrumbRequestField()}", "${h.getCrumb(request)}");
@@ -142,19 +163,19 @@ THE SOFTWARE.
                             <j:forEach var="hook" items="${section.getCustomHookPreBuildList()}">
                               <!--<j:out value="${section.getElement()}"/>-->
                               <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                                <p class="state" style="display:none">${section.hookStatus('PRE_BUILD',hook)}</p>
+
                                 <span class="normal-state">
                                   <a class="btn-link" href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/build/">
                                   <span class="hook-label" >${hook}</span>
                                   </a>
-
                                   <!--<span class="hook-edit d-none" ><input type="text" value=""/></span>-->
                                   <span class="action-icons pull-right ">
                                     <span class="icon-set d-none">
                                       <!--<i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>-->
-
                                       <j:set var="preBuildHookDisableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/disable"/>
                                       <j:set var="preBuildDisableHook" value="javascript:new Ajax.Request('${preBuildHookDisableRequest}', {method: 'post'});"/>
-                                      <a onclick="${preBuildDisableHook}">
+                                      <a onclick="${preBuildDisableHook};">
                                         <i class="icon16 icon-disable-hook v-middle di-block"></i>
                                       </a>
                                     </span>
@@ -168,7 +189,11 @@ THE SOFTWARE.
 
                                       <j:set var="preBuildDeleteRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/doDelete"/>
                                       <j:set var="preBuildDeleteHook" value="javascript:new Ajax.Request('${preBuildDeleteRequest}', {method: 'post'});"/>
-                                      <i class="icon16 icon-delete-hook v-middle di-block"></i>
+                                      <p style="display:none">${preBuildDeleteHook}</p>
+                                      <a onclick="$(this).siblings('p').addClass('tempDeleteClass');">
+                                        <i class="icon16 icon-delete-hook v-middle di-block"></i>
+                                      </a>
+
                                     </span>
                                     <span class="icon-edit-set d-none">
                                       <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
@@ -189,8 +214,8 @@ THE SOFTWARE.
                           <div class="inner-content">
                             <p class="text-white">Do you want to delete selected "Hook"?</p>
                             <div class="btn-container">
-                              <a href="javascript:void();" class="button-over cancel-delete button-over mr-5"> Cancel </a>
-                              <button type="button" class="btn btn-primary-m delete-confirm" onclick="${preBuildDeleteHook}">Yes</button>
+                              <a href="javascript:void();" onclick="undoDeleteHook()" class="button-over cancel-delete button-over mr-5"> Cancel </a>
+                              <button type="button" onclick="deleteHook()" class="btn btn-primary-m delete-confirm" >Yes</button>
                             </div>
                           </div>
                         </div>
@@ -206,6 +231,7 @@ THE SOFTWARE.
                           <ul class="sortable hook-items" >
                             <j:forEach var="hook" items="${section.getCustomHookPostBuildList()}">
                             <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                              <p class="state" style="display:none">${section.hookStatus('POST_BUILD',hook)}</p>
                               <span class="normal-state">
                                 <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_BUILD/job/${hook}/build/">
                                 <span class="hook-label" >${hook}</span>
@@ -231,7 +257,10 @@ THE SOFTWARE.
 
                                     <j:set var="deleteRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_BUILD/job/${hook}/doDelete"/>
                                     <j:set var="deleteHook" value="javascript:new Ajax.Request('${deleteRequest}', {method: 'post'});"/>
-                                    <i class="icon16 icon-delete-hook v-middle di-block"></i>
+                                    <p style="display:none">${deleteHook}</p>
+                                    <a onclick="$(this).siblings('p').addClass('tempDeleteClass');">
+                                      <i class="icon16 icon-delete-hook v-middle di-block"></i>
+                                    </a>
 
                                   </span>
                                   <span class="icon-edit-set d-none">
@@ -252,8 +281,8 @@ THE SOFTWARE.
                           <div class="inner-content">
                             <p class="text-white">Do you want to delete selected "Hook"?</p>
                             <div class="btn-container">
-                              <a href="javascript:void();" class="button-over cancel-delete button-over mr-5"> Cancel </a>
-                              <button type="button" class="btn btn-primary-m delete-confirm" onclick="${deleteHook}">Yes</button>
+                              <a href="javascript:void();" onclick="undoDeleteHook()" class="button-over cancel-delete button-over mr-5"> Cancel </a>
+                              <button type="button" onclick="deleteHook()" class="btn btn-primary-m delete-confirm" >Yes</button>
                             </div>
                           </div>
                         </div>
@@ -269,10 +298,12 @@ THE SOFTWARE.
                           <ul class="sortable hook-items" >
                             <j:forEach var="hook" items="${section.getCustomHookPostTestList()}">
                               <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                                <p class="state" style="display:none">${section.hookStatus('POST_TEST',hook)}</p>
                                 <span class="normal-state">
                                   <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_TEST/job/${hook}/build/">
                                   <span class="hook-label" >${hook}</span>
                                   </a>
+
                                   <span class="hook-edit d-none" ><input type="text" value=""/></span>
                                   <span class="action-icons pull-right ">
                                     <span class="icon-set d-none">
@@ -293,7 +324,12 @@ THE SOFTWARE.
 
                                       <j:set var="postTestDeleteRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_TEST/job/${hook}/doDelete"/>
                                       <j:set var="postTestDeleteHook" value="javascript:new Ajax.Request('${postTestDeleteRequest}', {method: 'post'});"/>
-                                      <i class="icon16 icon-delete-hook v-middle di-block"></i>
+
+                                      <p style="display:none">${postTestDeleteHook}</p>
+
+                                      <a onclick="$(this).siblings('p').addClass('tempDeleteClass');">
+                                        <i class="icon16 icon-delete-hook v-middle di-block"></i>
+                                      </a>
                                     </span>
                                     <span class="icon-edit-set d-none">
                                       <i class="icon16 icon-commit-hook v-middle mr-5 di-block"></i>
@@ -314,8 +350,8 @@ THE SOFTWARE.
                           <div class="inner-content">
                             <p class="text-white">Do you want to delete selected "Hook"?</p>
                             <div class="btn-container">
-                              <a href="javascript:void();" class="button-over cancel-delete button-over mr-5"> Cancel </a>
-                              <button type="button" class="btn btn-primary-m delete-confirm" onclick="${postTestDeleteHook}">Yes</button>
+                              <a href="javascript:void();" onclick="undoDeleteHook()" class="button-over cancel-delete button-over mr-5"> Cancel </a>
+                              <button type="button" onclick="deleteHook()" class="btn btn-primary-m delete-confirm" >Yes</button>
                             </div>
                           </div>
                         </div>
