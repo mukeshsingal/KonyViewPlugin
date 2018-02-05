@@ -220,9 +220,10 @@ THE SOFTWARE.
                                     </span>
                                     <span class="icon-disable-set d-none">
 
-                                      <j:set var="preBuildEnableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/enable"/>
-                                      <j:set var="preBuildEnableHook" value="javascript:new Ajax.Request('${preBuildEnableRequest}', {method: 'post'});"/>
-                                      <a onclick="${preBuildEnableHook}">
+                                      <!--<j:set var="preBuildEnableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/enable"/>-->
+                                      <!--<j:set var="preBuildEnableHook" value="javascript:new Ajax.Request('${preBuildEnableRequest}', {method: 'post'});"/>-->
+                                      <!--<a onclick="${preBuildEnableHook}">-->
+                                      <a onclick="enableHook('${hook}', 'PRE_BUILD')">
                                         <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
                                       </a>
 
@@ -452,6 +453,10 @@ THE SOFTWARE.
           function disableHook(hookName, stage){
             console.info("Disabled " + hookName + " in "+ stage + " stage")
             foo.disableHook(hookName, stage);
+          }
+          function enableHook(hookName, stage){
+            console.info("Enable " + hookName + " in "+ stage + " stage")
+            foo.enableHook(hookName, stage);
           }
         </script>
       <script src="${rootURL}/plugin/KonyCustomView/app-factory/js/custom.js"></script>

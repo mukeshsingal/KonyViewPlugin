@@ -267,6 +267,21 @@ public class TextSection extends SectionedViewSection {
             ((WorkflowJob) job).setDisabled(true);
         }
     }
+    @JavaScriptMethod
+    public void enableHook(String hookName, String stage) throws IOException, ServletException {
+        System.out.println("Enable Hook - " + hookName );
+        Item job = Jenkins.getInstance().getItemByFullName(getName() +"/Visualizer/Builds/CustomHook/"+stage+"/"+hookName);
+
+        if(job instanceof hudson.model.FreeStyleProject){
+            System.out.println("--Set enable Invoked for FS--");
+            ((FreeStyleProject) job).enable();
+        }
+
+        if(job instanceof org.jenkinsci.plugins.workflow.job.WorkflowJob){
+            System.out.println("--Set enable Invoked for pipeline--");
+            ((WorkflowJob) job).setDisabled(false);
+        }
+    }
 
     @JavaScriptMethod
     public void deleteHook(String hookName, String stage) throws Throwable {
