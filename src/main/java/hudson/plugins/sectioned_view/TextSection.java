@@ -37,14 +37,29 @@ import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 import com.cloudbees.hudson.plugins.folder.Folder;
+
+import javax.servlet.ServletException;
 import java.io.*;
 import java.util.*;
 
 
 public class TextSection extends SectionedViewSection {
     public List<String> hooks;
+    List<String> hookList = new ArrayList<>();
+
+    public List<String> getHookList() {
+        return hookList;
+    }
+
+    public void setHookList(List<String> hookList) {
+        this.hookList = hookList;
+    }
+
+
     private String text;
     private Style style;
+
+
 
     /**
      * @deprecated since 1.8 use {@link #TextSection(String, Width, Positioning, String, Style)} instead
@@ -75,6 +90,39 @@ public class TextSection extends SectionedViewSection {
 
     public boolean hasStyle() {
         return style != Style.NONE;
+    }
+
+    @JavaScriptMethod
+    public void updateSequence(Integer newIndex, String hookName){
+        Integer oldIndex = null;
+        List<String> hooks;
+        hooks = getHookList();
+
+        System.out.println("Update function is called "+ hooks.toString());
+        System.out.println("Got change Index " + newIndex.toString() +" HookName : "+ hookName);
+
+
+        int index = 0;
+        for (String entry : hooks) {
+            if(entry.equals(hookName)){
+                oldIndex = index;
+            }
+            index = index +1;
+        }
+
+        System.out.println(" Element with Key = " + oldIndex.toString());
+
+        hooks.remove(hookName);
+        hooks.add(newIndex, hookName);
+        System.out.println("updated list is "+ hooks.toString());
+        setHookList(hooks);
+
+    }
+
+    @JavaScriptMethod
+    public void printSequence(){
+        List<String> seq = getHookList();
+        System.out.println("Got this info " +seq.toString());
     }
 
 
@@ -113,6 +161,7 @@ public class TextSection extends SectionedViewSection {
         return null;
     }
     public String getCustomHookPostBuildList(){
+
         String name = "";
         Jenkins instance = Jenkins.getInstance();
 
@@ -133,7 +182,7 @@ public class TextSection extends SectionedViewSection {
         }
         return name;
     }
-
+    @JavaScriptMethod
     public String hookStatus(String state, String hookName){
         String status= "Not Available";
         Jenkins instance = Jenkins.getInstance();
@@ -146,7 +195,7 @@ public class TextSection extends SectionedViewSection {
                     for(Object job : jobsArr) {
                         if(((Job) job).getDisplayName().equals(hookName)) {
                             status = String.valueOf(((Job) job).isBuildable());
-                            System.out.println("hook Status is " + hookName +"    isBuildable "+ status);
+                            System.out.println("       " + hookName +"    isBuildable "+ status);
                         }
                     }
                 }
@@ -155,6 +204,12 @@ public class TextSection extends SectionedViewSection {
         return status;
     }
     public String getCustomHookPreBuildList(){
+
+        List<String> hooks = new ArrayList<>();
+        List<String> OldHookList;
+        OldHookList = getHookList();
+
+        int index = 0;
         String name = "";
         Jenkins instance = Jenkins.getInstance();
 
@@ -167,7 +222,12 @@ public class TextSection extends SectionedViewSection {
                     Object[] jobsArr = item.getAllJobs().toArray();
 
                     for(Object job : jobsArr) {
+
                         String hookName = ((Job) job).getDisplayName();
+                        //UpdateCurrentSequence
+                        hooks.add(hookName);
+                        index = index +1;
+
                         name = name +","+ hookName;
                         System.out.println("       Job ->"+ name + String.valueOf(((Job) job).isBuildable()));
                         hookStatus("PRE_BUILD",hookName);
@@ -175,25 +235,52 @@ public class TextSection extends SectionedViewSection {
                 }
             }
         }
-        return name;
+
+        if(OldHookList == null){
+            setHookList(hooks);
+            return String.join(",", hooks);
+        }
+        else{
+            if (OldHookList.size() == hooks.size()){
+                return String.join(",", OldHookList);
+            }
+            else {
+                setHookList(hooks);
+                return name;
+            }
+        }
     }
 
 
+    @JavaScriptMethod
+    public void disableHook(String hookName, String stage) throws IOException, ServletException {
+        System.out.println("Disabled Hook - " + hookName );
+        Item job = Jenkins.getInstance().getItemByFullName(getName() +"/Visualizer/Builds/CustomHook/"+stage+"/"+hookName);
 
-    public void doDisable(String hookName){
-        System.out.println("doDisable("+hookName+")");
-        Item job = Jenkins.getInstance().getItemByFullName(getName() +"/Visualizer/Builds/CustomHook/PRE_BUILD"+hookName);
         if(job instanceof hudson.model.FreeStyleProject){
-            try {
-                System.out.println("--Set Disable Invoked for FS--");
-                ((FreeStyleProject) job).disable();
-            } catch(IOException ie) {
-                ie.printStackTrace();
-            }
+            System.out.println("--Set Disable Invoked for FS--");
+            ((FreeStyleProject) job).disable();
         }
+
         if(job instanceof org.jenkinsci.plugins.workflow.job.WorkflowJob){
             System.out.println("--Set Disable Invoked for pipeline--");
             ((WorkflowJob) job).setDisabled(true);
+        }
+    }
+
+    @JavaScriptMethod
+    public void deleteHook(String hookName, String stage) throws Throwable {
+        System.out.println("Delete  Hook - " + hookName );
+        Item job = Jenkins.getInstance().getItemByFullName(getName() +"/Visualizer/Builds/CustomHook/"+stage+"/"+hookName);
+
+        if(job instanceof hudson.model.FreeStyleProject){
+            System.out.println("--Set Delete Invoked for FS--");
+            job.delete();
+        }
+
+        if(job instanceof org.jenkinsci.plugins.workflow.job.WorkflowJob){
+            System.out.println("--Set delete Invoked for pipeline--");
+            job.delete();
         }
     }
 

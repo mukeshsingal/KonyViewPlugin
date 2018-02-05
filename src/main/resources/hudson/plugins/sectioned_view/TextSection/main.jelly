@@ -53,30 +53,71 @@ THE SOFTWARE.
       <script src="${rootURL}/plugin/KonyCustomView/app-factory/js/jquery-ui.js"></script>
       <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
       <script src="${rootURL}/plugin/KonyCustomView/app-factory/js/bootstrap.min.js"></script>
+      <script src="${rootURL}/plugin/KonyCustomView/app-factory/js/CustomHook.js"></script>
+
+
       <script>
-        $(document).ready(function(){
-        $('.app-factory').parent().parent().css('clear','none');
-        $(".state").each( function( index, element ){
-          if($( this ).text() == "false"){
-            $(this).parent().addClass("disabled");
-            $(this).parent().removeClass("active");
+         var foo;
+         if (window.makeStaplerProxy) {
+             window.__old__makeStaplerProxy = window.makeStaplerProxy;
+             window.makeStaplerProxy = CustomView.makeStaplerProxy2;
+         }
+         foo = <st:bind value="${section}"/> ;
+         if (window.makeStaplerProxy) {
+             window.makeStaplerProxy = window.__old__makeStaplerProxy;
+         }
 
-            $(this).siblings('.normal-state').children('.action-icons').children('.icon-set').addClass('d-none');
-            $(this).siblings('.normal-state').children('.action-icons').children('.icon-set').removeClass('icon-set');
+         function correctStage(stage) {
+          var tempStage = "";
+          if (stage == "Hook Point PreBuild") {
+              tempStage = "PRE_BUILD";
+          } else if (stage == "Hook Point PostBuild") {
+              tempStage = "POST_BUILD";
+          } else {
+              tempStage = "POST_TEST";
+          }
 
-            $(this).siblings('.normal-state').children('.action-icons').children('.icon-disable-set').removeClass('d-none');
+          return tempStage
         }
-        else( console.log("Not Hello"))
-        });
-        });
-      </script>
-      <script>
+
+         $(document).ready(function() {
+               console.info("Inside Ready Function ")
+               $('.app-factory').parent().parent().css('clear', 'none');
+               $('.hook-point-container').each(
+                   function(index, element) {
+                       var stage = $(this).find('.label-header').text();
+
+                       $(this).find('.hook-label').each(function(name, val) {
+                           var hookName = $(this).text();
+                           var x = foo.hookStatus(correctStage(stage), hookName , function(t){
+                              var status = t.responseObject();
+                                  if(status == "false"){
+                                   $(val).parent().parent().parent().addClass("disabled");
+                                    $(val).parent().siblings('.action-icons').children('.icon-set').addClass('d-none');
+                                    $(val).parent().siblings('.action-icons').children('.icon-set').removeClass('icon-set');
+                                    $(val).parent().siblings('.action-icons').children('.icon-disable-set').removeClass('d-none');
+                                    console.info(name + " - >"+ val);
+                                  }
+                                  else{
+                                      console.info(" ->"+ correctStage(stage) + "->"+ hookName +" ->"+ status);
+                                  }
+                           });
+
+                       });
+                   }
+               )
+          });
+
         function deleteHook(){
-        var x = $(".tempDeleteClass").text()
-        eval(x)
+          var x = $(".tempDeleteClass").text()
+          var res = x.split(",")
+          var hookName = res[0];
+          var hookStage = res[1];
+          foo.deleteHook(hookName, hookStage)
+
         }
         function undoDeleteHook(){
-        $(".tempDeleteClass").removeClass("tempDeleteClass")
+          $(".tempDeleteClass").removeClass("tempDeleteClass")
         }
       </script>
       <script>
@@ -163,7 +204,7 @@ THE SOFTWARE.
                             <j:forEach var="hook" items="${section.getCustomHookPreBuildList()}">
                               <!--<j:out value="${section.getElement()}"/>-->
                               <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                                <p class="state" style="display:none">${section.hookStatus('PRE_BUILD',hook)}</p>
+
 
                                 <span class="normal-state">
                                   <a class="btn-link" href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/build/">
@@ -173,9 +214,7 @@ THE SOFTWARE.
                                   <span class="action-icons pull-right ">
                                     <span class="icon-set d-none">
                                       <!--<i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>-->
-                                      <j:set var="preBuildHookDisableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/disable"/>
-                                      <j:set var="preBuildDisableHook" value="javascript:new Ajax.Request('${preBuildHookDisableRequest}', {method: 'post'});"/>
-                                      <a onclick="${preBuildDisableHook};">
+                                      <a onclick="disableHook('${hook}', 'PRE_BUILD')">
                                         <i class="icon16 icon-disable-hook v-middle di-block"></i>
                                       </a>
                                     </span>
@@ -189,7 +228,7 @@ THE SOFTWARE.
 
                                       <j:set var="preBuildDeleteRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/doDelete"/>
                                       <j:set var="preBuildDeleteHook" value="javascript:new Ajax.Request('${preBuildDeleteRequest}', {method: 'post'});"/>
-                                      <p style="display:none">${preBuildDeleteHook}</p>
+                                      <p style="display:none">${hook},PRE_BUILD</p>
                                       <a onclick="$(this).siblings('p').addClass('tempDeleteClass');">
                                         <i class="icon16 icon-delete-hook v-middle di-block"></i>
                                       </a>
@@ -231,7 +270,7 @@ THE SOFTWARE.
                           <ul class="sortable hook-items" >
                             <j:forEach var="hook" items="${section.getCustomHookPostBuildList()}">
                             <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                              <p class="state" style="display:none">${section.hookStatus('POST_BUILD',hook)}</p>
+
                               <span class="normal-state">
                                 <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_BUILD/job/${hook}/build/">
                                 <span class="hook-label" >${hook}</span>
@@ -242,9 +281,7 @@ THE SOFTWARE.
                                   <span class="icon-set d-none">
 
                                     <!--<i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>-->
-                                    <j:set var="disableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_BUILD/job/${hook}/disable"/>
-                                    <j:set var="disableHook" value="javascript:new Ajax.Request('${disableRequest}', {method: 'post'});"/>
-                                    <a onclick="${disableHook}">
+                                    <a onclick="disableHook('${hook}', 'POST_BUILD')">
                                       <i class="icon16 icon-disable-hook v-middle di-block"></i>
                                     </a>
                                   </span>
@@ -257,7 +294,7 @@ THE SOFTWARE.
 
                                     <j:set var="deleteRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_BUILD/job/${hook}/doDelete"/>
                                     <j:set var="deleteHook" value="javascript:new Ajax.Request('${deleteRequest}', {method: 'post'});"/>
-                                    <p style="display:none">${deleteHook}</p>
+                                    <p style="display:none">${hook},POST_BUILD</p>
                                     <a onclick="$(this).siblings('p').addClass('tempDeleteClass');">
                                       <i class="icon16 icon-delete-hook v-middle di-block"></i>
                                     </a>
@@ -279,7 +316,7 @@ THE SOFTWARE.
                         </div>
                         <div class="confirm-delete" style="display:none">
                           <div class="inner-content">
-                            <p class="text-white">Do you want to delete selected "Hook"?</p>
+                            <p class="text-white"> Do you want to delete selected "Hook"?</p>
                             <div class="btn-container">
                               <a href="javascript:void();" onclick="undoDeleteHook()" class="button-over cancel-delete button-over mr-5"> Cancel </a>
                               <button type="button" onclick="deleteHook()" class="btn btn-primary-m delete-confirm" >Yes</button>
@@ -298,7 +335,7 @@ THE SOFTWARE.
                           <ul class="sortable hook-items" >
                             <j:forEach var="hook" items="${section.getCustomHookPostTestList()}">
                               <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                                <p class="state" style="display:none">${section.hookStatus('POST_TEST',hook)}</p>
+
                                 <span class="normal-state">
                                   <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_TEST/job/${hook}/build/">
                                   <span class="hook-label" >${hook}</span>
@@ -309,9 +346,7 @@ THE SOFTWARE.
                                     <span class="icon-set d-none">
                                       <!--<i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>-->
 
-                                      <j:set var="postTestDisableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_TEST/job/${hook}/disable"/>
-                                      <j:set var="postTestDisableHook" value="javascript:new Ajax.Request('${postTestDisableRequest}', {method: 'post'});"/>
-                                      <a onclick="${postTestDisableHook}">
+                                      <a onclick="disableHook('${hook}', 'POST_TEST')">
                                         <i class="icon16 icon-disable-hook v-middle di-block"></i>
                                       </a>
                                     </span>
@@ -325,7 +360,7 @@ THE SOFTWARE.
                                       <j:set var="postTestDeleteRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_TEST/job/${hook}/doDelete"/>
                                       <j:set var="postTestDeleteHook" value="javascript:new Ajax.Request('${postTestDeleteRequest}', {method: 'post'});"/>
 
-                                      <p style="display:none">${postTestDeleteHook}</p>
+                                      <p style="display:none">${hook},POST_TEST</p>
 
                                       <a onclick="$(this).siblings('p').addClass('tempDeleteClass');">
                                         <i class="icon16 icon-delete-hook v-middle di-block"></i>
@@ -406,14 +441,43 @@ THE SOFTWARE.
       <!-- Notification messages -->
       <div id="service-created"></div>
       <!-- Notification messages -->
+
+      <button onclick="printSequence()">Print Pre Build Sequence</button>
+
+      <script type="text/javascript">
+          function printSequence(){
+            console.info ("print sequence");
+            foo.printSequence();
+          }
+          function disableHook(hookName, stage){
+            console.info("Disabled " + hookName + " in "+ stage + " stage")
+            foo.disableHook(hookName, stage);
+          }
+        </script>
       <script src="${rootURL}/plugin/KonyCustomView/app-factory/js/custom.js"></script>
 
       <script>
 
         $( function() {
-        $( ".sortable" ).sortable();
-        $( ".sortable" ).disableSelection();
-        $( ".sortable" ).sortable({ axis: 'y' });
+          $( ".sortable" ).sortable();
+          $( ".sortable" ).disableSelection();
+          $( ".sortable" ).sortable({ axis: 'y' });
+        });
+        $(function() {
+          $( ".sortable" ).sortable({
+              update: function(event, ui) {
+                    console.log(ui.item)
+                    var hookName = ui.item.find('.hook-label').text();
+                    var updatedIndex = ui.item.index();
+                    console.log('update: Index:'+ updatedIndex + " Hook:"  + hookName);
+
+                    foo.updateSequence(updatedIndex, hookName)
+              },
+              start: function(event, ui) {
+                  console.log('start: ' + ui.item.index() + ui.item.text())
+              }
+          });
+          $( ".sortable" ).disableSelection();
         });
       </script>
     </body>

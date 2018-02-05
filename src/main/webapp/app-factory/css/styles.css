@@ -137,16 +137,16 @@ a, a:visited, a:hover {
 }
 .arrow-left {
     background: url(../images/arrow_right.png) no-repeat;
-    height: 81px;
-    width: 145px;
+    height: 68px;
+    width: 160px;
     display: inline-block;
     background-size: 90%;
-    background-position: 10px 20px;
-    -moz-transform: scaleX(-1);
-    -o-transform: scaleX(-1);
-    -webkit-transform: scaleX(-1);
-    -ms-transform: scaleX(-1);
-    transform: scaleX(-1);
+    background-position: 5px 0;
+    -moz-transform: scaleY(-1);
+    -o-transform: scaleY(-1);
+    -webkit-transform: scaleY(-1);
+    -ms-transform: scaleY(-1);
+    transform: scaleY(-1);
     -ms-filter: "FlipH";
     filter: FlipH;
 }
