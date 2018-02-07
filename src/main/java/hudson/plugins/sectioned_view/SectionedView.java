@@ -30,12 +30,7 @@ import hudson.util.DescribableList;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import javax.servlet.ServletException;
 
@@ -46,7 +41,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
-public class SectionedView extends View {
+public class SectionedView extends View 	{
 
 	private DescribableList<SectionedViewSection, Descriptor<SectionedViewSection>> sections;
 

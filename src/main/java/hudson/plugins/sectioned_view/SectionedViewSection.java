@@ -60,6 +60,10 @@ public abstract class SectionedViewSection implements ExtensionPoint, Describabl
         initJobFilters();
     }
 
+    public SectionedViewSection(String name){
+        this.name = name;
+    }
+
     /**
      * List of job names. This is what gets serialized.
      */

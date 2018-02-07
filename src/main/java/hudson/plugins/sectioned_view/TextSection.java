@@ -23,10 +23,7 @@
  */
 package hudson.plugins.sectioned_view;
 
-import hudson.model.FreeStyleProject;
-import hudson.model.Item;
-import hudson.model.Job;
-import hudson.model.TopLevelItem;
+import hudson.model.*;
 import jenkins.model.Jenkins;
 import hudson.Extension;
 import hudson.util.EnumConverter;
@@ -47,6 +44,10 @@ public class TextSection extends SectionedViewSection {
     public List<String> hooks;
     List<String> hookList = new ArrayList<>();
 
+    public ConfigFileHelper getConfigFileHelper() {
+        return new ConfigFileHelper();
+    }
+
     public List<String> getHookList() {
         return hookList;
     }
@@ -55,11 +56,13 @@ public class TextSection extends SectionedViewSection {
         this.hookList = hookList;
     }
 
-
     private String text;
     private Style style;
 
 
+    public TextSection(String name){
+       super(name);
+    }
 
     /**
      * @deprecated since 1.8 use {@link #TextSection(String, Width, Positioning, String, Style)} instead
@@ -68,6 +71,7 @@ public class TextSection extends SectionedViewSection {
     public TextSection(String name, Width width, Positioning alignment, String text) {
         this(name, width, alignment, text, Style.NONE);
     }
+
 
     @DataBoundConstructor
     public TextSection(String name, Width width, Positioning alignment, String text, Style style) {
@@ -93,7 +97,7 @@ public class TextSection extends SectionedViewSection {
     }
 
     @JavaScriptMethod
-    public void updateSequence(Integer newIndex, String hookName){
+    public void updateSequence(Integer newIndex, String hookName) throws IOException {
         Integer oldIndex = null;
         List<String> hooks;
         hooks = getHookList();
@@ -117,6 +121,7 @@ public class TextSection extends SectionedViewSection {
         System.out.println("updated list is "+ hooks.toString());
         setHookList(hooks);
 
+        getConfigFileHelper().createConfigFile(getName(),getName(),hooks, "PRE_BUILD");
     }
 
     @JavaScriptMethod
@@ -260,11 +265,13 @@ public class TextSection extends SectionedViewSection {
         if(job instanceof hudson.model.FreeStyleProject){
             System.out.println("--Set Disable Invoked for FS--");
             ((FreeStyleProject) job).disable();
+            getConfigFileHelper().updateStatusOfHook(getName(),getName(),job.getDisplayName(),stage,"disabled");
         }
 
         if(job instanceof org.jenkinsci.plugins.workflow.job.WorkflowJob){
             System.out.println("--Set Disable Invoked for pipeline--");
             ((WorkflowJob) job).setDisabled(true);
+            getConfigFileHelper().updateStatusOfHook(getName(),getName(),job.getDisplayName(),stage,"disabled");
         }
     }
     @JavaScriptMethod
@@ -275,11 +282,13 @@ public class TextSection extends SectionedViewSection {
         if(job instanceof hudson.model.FreeStyleProject){
             System.out.println("--Set enable Invoked for FS--");
             ((FreeStyleProject) job).enable();
+            getConfigFileHelper().updateStatusOfHook(getName(),getName(),job.getDisplayName(),stage,"enabled");
         }
 
         if(job instanceof org.jenkinsci.plugins.workflow.job.WorkflowJob){
             System.out.println("--Set enable Invoked for pipeline--");
             ((WorkflowJob) job).setDisabled(false);
+            getConfigFileHelper().updateStatusOfHook(getName(),getName(),job.getDisplayName(),stage,"enabled");
         }
     }
 
@@ -291,11 +300,13 @@ public class TextSection extends SectionedViewSection {
         if(job instanceof hudson.model.FreeStyleProject){
             System.out.println("--Set Delete Invoked for FS--");
             job.delete();
+            getConfigFileHelper().deleteHookInJson(getName(),getName(),job.getDisplayName(),stage);
         }
 
         if(job instanceof org.jenkinsci.plugins.workflow.job.WorkflowJob){
             System.out.println("--Set delete Invoked for pipeline--");
             job.delete();
+            getConfigFileHelper().deleteHookInJson(getName(),getName(),job.getDisplayName(),stage);
         }
     }
 
