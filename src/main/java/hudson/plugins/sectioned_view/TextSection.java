@@ -24,10 +24,12 @@
 package hudson.plugins.sectioned_view;
 
 import hudson.model.*;
+import javafx.beans.binding.BooleanExpression;
 import jenkins.model.Jenkins;
 import hudson.Extension;
 import hudson.util.EnumConverter;
 import net.sf.json.JSONObject;
+
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
@@ -38,6 +40,8 @@ import com.cloudbees.hudson.plugins.folder.Folder;
 import javax.servlet.ServletException;
 import java.io.*;
 import java.util.*;
+import com.wangyin.parameter.WHideParameterDefinition;
+
 
 
 public class TextSection extends SectionedViewSection {
@@ -165,6 +169,7 @@ public class TextSection extends SectionedViewSection {
         }
         return null;
     }
+
     public String getCustomHookPostBuildList(){
 
         String name = "";
@@ -187,6 +192,104 @@ public class TextSection extends SectionedViewSection {
         }
         return name;
     }
+
+    public void printMsg(String functionName, String propertyName, Object msg){
+        if(msg == null) {
+            System.out.println("\n"+functionName + ": " + propertyName + " = is Null");
+        }
+        else{
+            System.out.println("\n"+functionName + ": " + propertyName + " = " + msg.toString());
+        }
+    }
+
+    @JavaScriptMethod
+    public void updateHookJob(String hookName, String hookStage) throws IOException {
+        /* Get hook properties */
+        System.out.println("\n\nupdateHookJob: ->");
+        String hookProperties = getConfigFileHelper().getHookFromConfigs(getName(), hookName, hookStage);
+        printMsg("updateHookJob","hookProperties", hookProperties);
+
+        org.json.JSONObject hookPropertiesInJson = new org.json.JSONObject(hookProperties);
+        printMsg("updateHookJob","hookPropertiesInJson", hookPropertiesInJson);
+
+        String isBlocking = hookPropertiesInJson.getString("isBlocking");
+        printMsg("updateHookJob","isBlocking", isBlocking);
+
+        String url = hookPropertiesInJson.getString("hookUrl");
+        printMsg("updateHookJob","url", url);
+
+
+        /* Read hookParameters from Config */
+        String parameters = getConfigFileHelper().getParametersOfHookFromConfigs(getName(), hookName, hookStage);
+        org.json.JSONObject hookParametersInJson = new org.json.JSONObject(parameters);
+
+        String scriptArgs = hookParametersInJson.getString("SCRIPT_ARGUMENTS");
+        printMsg("updateHookJob","scriptArgs", scriptArgs);
+
+        String buildAction = hookParametersInJson.getString("BUILD_ACTION");
+        printMsg("updateHookJob","buildAction", buildAction);
+
+        /* Parameters descriptions */
+        String hookNameDesc             = "Name of Custom Hook. It must start with a letter, only contain letters and numbers and be between 4 and 17 characters long.";
+        String buildStepDesc            = "Select one of the following phases where you want to inject custom hook.";
+        String newHookNameDesc          = "Optional: Rename Custom Hook to new Custom Hook name.";
+        String buildActionDesc          = "Optional: Type of hook you want to run.";
+        String scriptArgumentDesc       = "Optional: Specify targets, goal or arguments for Hook. These args will be used while invoking Custon Hook scripts. In Ant - pass args like -DProjectName=ABC In Maven - Specify goals clean install ";
+        String isBlockingDesc           = "Optional: Block until the triggered Hooks finish their builds.";
+        String hookFileParameterDesc    = "Optional: Upload custom hook project zip. It must contain ant and maven script at root location.\n Currently only Ant and Maven hooks are being supported by AppFactory.";
+
+        /* Put Hook Properties and Parameter in update job. */
+        Jenkins instance = Jenkins.getInstance();
+        List<Item> items = instance.getAllItems();
+
+        for(Item item : items){
+            if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
+                if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook").trim())){
+                    Object[] jobsArray = item.getAllJobs().toArray();
+                    for(Object job : jobsArray) {
+                        if(((Job) job).getDisplayName().equals("_updateCustomHook")) {
+
+                            /* Helpers to create default values in Choice Parameters */
+                            StringParameterDefinition defaultBuildActionParameter = new StringParameterDefinition("XYZ", buildAction);
+                            String[] buildActionChoices = {"Execute Ant", "Execute Maven"};
+
+                            /* Create new parameter definitions with hook parameters and properties */
+                            WHideParameterDefinition hookNameParameter = new WHideParameterDefinition("HOOK_NAME",hookName,hookNameDesc);
+
+                            WHideParameterDefinition buildStepParameter = new WHideParameterDefinition("BUILD_STEP",hookStage+"_STEP",buildStepDesc);
+
+                            StringParameterDefinition newHookNameParameter = new StringParameterDefinition("NEW_HOOK_NAME", hookName,newHookNameDesc );
+
+                            ChoiceParameterDefinition buildActionParameterWithoutDefaultValue = new ChoiceParameterDefinition( "BUILD_ACTION", buildActionChoices, buildActionDesc);
+                            ParameterDefinition buildActionParameter = buildActionParameterWithoutDefaultValue.copyWithDefaultValue(defaultBuildActionParameter.getDefaultParameterValue());
+
+                            StringParameterDefinition scriptArgumentsParameter = new StringParameterDefinition("SCRIPT_ARGUMENTS", scriptArgs, scriptArgumentDesc);
+
+                            FileParameterDefinition hookFileParameter = new FileParameterDefinition("HOOK_ARCHIVE_FILE", hookFileParameterDesc);
+
+                            BooleanParameterDefinition isBlockingParameter = new BooleanParameterDefinition("IS_SYNCHRONOUS_CALL", Boolean.valueOf(isBlocking),isBlockingDesc);
+
+                            ParameterDefinition[] newParameters = {
+                                    hookNameParameter,
+                                    buildStepParameter,
+                                    newHookNameParameter,
+                                    buildActionParameter,
+                                    scriptArgumentsParameter,
+                                    hookFileParameter,
+                                    isBlockingParameter
+                            };
+
+                            /* Remove old parameters from _updateHookJob*/
+                            ((Job) job).removeProperty(ParametersDefinitionProperty.class);
+                            /* Add new Parameters to _updateHookJob*/
+                            ((Job) job).addProperty(new ParametersDefinitionProperty(newParameters));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @JavaScriptMethod
     public String hookStatus(String state, String hookName){
         String status= "Not Available";
@@ -245,7 +348,8 @@ public class TextSection extends SectionedViewSection {
             setHookList(hooks);
             return String.join(",", hooks);
         }
-        else{
+
+        if(isHookListValid(OldHookList, hooks)){
             if (OldHookList.size() == hooks.size()){
                 return String.join(",", OldHookList);
             }
@@ -254,6 +358,20 @@ public class TextSection extends SectionedViewSection {
                 return name;
             }
         }
+        else{
+            setHookList(hooks);
+            return String.join(",", hooks);
+        }
+    }
+
+    public boolean isHookListValid(List<String> oldHookList,List<String> hookList ){
+        Boolean status = true;
+        for(String hook : hookList){
+            if(!oldHookList.contains(hook)){
+                status = false;
+            }
+        }
+        return status;
     }
 
 

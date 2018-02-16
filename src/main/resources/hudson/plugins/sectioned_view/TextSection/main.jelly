@@ -122,6 +122,15 @@ THE SOFTWARE.
       </script>
       <script>
         crumb.init("${h.getCrumbRequestField()}", "${h.getCrumb(request)}");
+
+        function updateThis(hookName, hookStage,  url){
+         console.info(url)
+         console.info(hookName)
+
+          foo.updateHookJob(hookName, hookStage)
+          window.location.href = url
+
+        }
       </script>
     </head>
     <body>
@@ -207,10 +216,15 @@ THE SOFTWARE.
 
 
                                 <span class="normal-state">
-                                  <a class="btn-link" href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/build/">
-                                  <span class="hook-label" >${hook}</span>
+
+
+                                  <!--<a class="btn-link" href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/PRE_BUILD/job/${hook}/build/">-->
+                                  <!--<span class="hook-label" >${hook}</span>-->
+                                  <!--</a>-->
+                                  <a onclick="updateThis('${hook}','PRE_BUILD','${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_updateCustomHook/build')" class="btn-link">
+                                   <span class="hook-label" >${hook}</span>
                                   </a>
-                                  <!--<span class="hook-edit d-none" ><input type="text" value=""/></span>-->
+                                  <span class="hook-edit d-none" ><input type="text" value=""/></span>
                                   <span class="action-icons pull-right ">
                                     <span class="icon-set d-none">
                                       <!--<i class="icon16 icon-edit-hook v-middle mr-5 di-block"></i>-->
@@ -273,7 +287,7 @@ THE SOFTWARE.
                             <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
 
                               <span class="normal-state">
-                                <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_BUILD/job/${hook}/build/">
+                                <a onclick="updateThis('${hook}','POST_BUILD','${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_updateCustomHook/build')" class="btn-link">
                                 <span class="hook-label" >${hook}</span>
                                 </a>
 
@@ -338,7 +352,7 @@ THE SOFTWARE.
                               <li class="ui-state-default active"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
 
                                 <span class="normal-state">
-                                  <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_TEST/job/${hook}/build/">
+                                  <a onclick="updateThis('${hook}','POST_TEST','${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_updateCustomHook/build')" class="btn-link">
                                   <span class="hook-label" >${hook}</span>
                                   </a>
 
@@ -443,13 +457,9 @@ THE SOFTWARE.
       <div id="service-created"></div>
       <!-- Notification messages -->
 
-      <button onclick="printSequence()">Print Pre Build Sequence</button>
+
 
       <script type="text/javascript">
-          function printSequence(){
-            console.info ("print sequence");
-            foo.printSequence();
-          }
           function disableHook(hookName, stage){
             console.info("Disabled " + hookName + " in "+ stage + " stage")
             foo.disableHook(hookName, stage);

@@ -24,12 +24,88 @@ import java.util.*;
 
 public class ConfigFileHelper {
 
+    public void printMsg(String functionName, String propertyName, Object msg){
+        if(msg == null) {
+            System.out.println("\n"+functionName + ": " + propertyName + " = is Null");
+        }
+        else{
+            System.out.println("\n"+functionName + ": " + propertyName + " = " + msg.toString());
+        }
+    }
+
     void createConfigFile(String folderName, String fileId, List<String> content, String stage) throws IOException {
         Item folderObject = getFolderObject(folderName);
         FolderConfigFileProperty folderConfigFilesObject = getConfigPropertyObject(folderObject);
         Collection<Config> availableConfigs = getAvailableConfigs(folderConfigFilesObject);
         createConfig(fileId, stage, content, folderConfigFilesObject, availableConfigs);
     }
+
+    String getParametersOfHookFromConfigs(String folderName, String hookName, String stage) throws IOException {
+
+        JSONObject hookParameters = null;
+
+        Item folderObject = getFolderObject(folderName);
+        FolderConfigFileProperty folderConfigFilesObject = getConfigPropertyObject(folderObject);
+        Collection<Config> availableConfigs = getAvailableConfigs(folderConfigFilesObject);
+        String olderContent = getConfigFileContent(folderName, availableConfigs);
+        JSONObject root = new JSONObject(olderContent);
+
+        JSONArray oldHooksProperties  = root.getJSONArray(stage);
+        Integer numberOfHooks = oldHooksProperties.length();
+        if(numberOfHooks != null){
+            Integer index =0;
+            while(index < numberOfHooks){
+                JSONObject array = oldHooksProperties.getJSONObject(index);
+
+                if((((String) array.get("hookName")).trim()).equals(hookName)){
+                    System.out.println(array.getJSONObject("parameter"));
+                    hookParameters = array.getJSONObject("parameter");
+                    break;
+                }
+                index++;
+            }
+        }
+        printMsg("getParametersOfHookFromConfigs","hookParameters", hookParameters);
+
+        return hookParameters.toString();
+    }
+
+    /**
+     * @param folderName name of project
+     * @param hookName name of hook
+     * @param hookStage stage of hook
+     * @return Object of hook properties
+     */
+    String getHookFromConfigs(String folderName, String hookName, String hookStage) throws IOException {
+
+        JSONObject hookProperties = null;
+
+        Item folderObject = getFolderObject(folderName);
+        FolderConfigFileProperty folderConfigFilesObject = getConfigPropertyObject(folderObject);
+        Collection<Config> availableConfigs = getAvailableConfigs(folderConfigFilesObject);
+        String olderContent = getConfigFileContent(folderName, availableConfigs);
+        JSONObject root = new JSONObject(olderContent);
+
+        JSONArray oldHooksProperties  = root.getJSONArray(hookStage);
+        Integer numberOfHooks = oldHooksProperties.length();
+        if(numberOfHooks != null){
+            Integer index =0;
+            while(index < numberOfHooks){
+                JSONObject array = oldHooksProperties.getJSONObject(index);
+
+                if((((String) array.get("hookName")).trim()).equals(hookName)){
+                    hookProperties = array;
+                    break;
+                }
+                index++;
+            }
+        }
+
+        printMsg("getHookFromConfigs", "hookProperties",hookProperties);
+
+        return hookProperties.toString();
+    }
+
 
 
     void updateStatusOfHook(String projectName,String fileId, String hookName, String stage, String status) throws IOException{
@@ -70,7 +146,7 @@ public class ConfigFileHelper {
             }
         }
         folderConfigFilesObject.save(new CustomConfig(configFileName, configFileName, newConfigComments, root.toString(4)));
-        System.out.println("Delete: CustomFile "+configFileName+" has been Updated successfully.");
+        System.out.println("deleteHook: CustomFile "+configFileName+" has been Updated successfully.");
     }
 
 
@@ -95,7 +171,7 @@ public class ConfigFileHelper {
             }
         }
         folderConfigFilesObject.save(new CustomConfig(configFileName, configFileName, newConfigComments, root.toString(4)));
-        System.out.println("Update: CustomFile "+configFileName+" has been Updated successfully with  Hook, Status");
+        System.out.println("updateStatus: CustomFile "+configFileName+" has been Updated successfully with  Hook, Status");
     }
 
 
@@ -105,12 +181,7 @@ public class ConfigFileHelper {
     */
     Item getFolderObject(String folderName) {
         Item folderObject = Jenkins.getInstance().getItem(folderName);
-        if(folderObject !=null){
-            System.out.println("In getFolder Object Not Null " + folderObject.getDisplayName());
-        }
-        else{
-            System.out.println("In getFolderObject got null");
-        }
+        printMsg("getFolderObject", "folderObject", folderObject);
         return folderObject;
     }
 
@@ -120,13 +191,7 @@ public class ConfigFileHelper {
         final AbstractFolder<?> folder = AbstractFolder.class.cast(folderObject);
         FolderConfigFileProperty folderConfigFileProperty = folder.getProperties().get(FolderConfigFileProperty.class);
 
-        if(folderConfigFileProperty == null){
-            System.out.println("folderConfigFileProperty is null");
-        }
-        else{
-            System.out.println("folderConfigFileProperty is not null");
-
-        }
+        printMsg("getConfigPropertyObject","folderConfigFileProperty", folderConfigFileProperty);
 
         return folderConfigFileProperty;
     }
@@ -139,12 +204,7 @@ public class ConfigFileHelper {
              availableConfigs = folderConfigFilesObject.getConfigs();
         }
 
-        if(availableConfigs !=null) {
-            System.out.println("getAvailableConfigs not null" + availableConfigs.toString());
-        }
-        else{
-            System.out.println("getAvailableConfigs null");
-        }
+        printMsg("getAvailableConfigs","availableConfigs",availableConfigs);
 
         return availableConfigs;
     }
@@ -198,7 +258,6 @@ public class ConfigFileHelper {
             ConfigProvider provider = config.getDescriptor();
             List<String> tempFiles = new ArrayList<>();
             tempFiles.add("Mukesh");
-            System.out.println("Hooks Config File Are  : "+config.name+ "And Param " + configFileName);
             if((config.name).equals(configFileName)){
                 unique = false;
             }
@@ -213,14 +272,16 @@ public class ConfigFileHelper {
             FilePath workspace= null;
             ConfigProvider provider = config.getDescriptor();
             List<String> tempFiles = new ArrayList<>();
-            tempFiles.add("Mukesh");
-            System.out.println("Hooks Config File Are  : "+config.name+ "And Param " + configFileName);
+            tempFiles.add("tempFileName");
             if((config.name).equals(configFileName)){
                 olderContent = config.getDescriptor().supplyContent(config, build, workspace, TaskListener.NULL,tempFiles);
             }
         }
+        printMsg("getConfigFileContent", "olderContent", olderContent);
         return olderContent;
     }
+
+
 }
 
 
