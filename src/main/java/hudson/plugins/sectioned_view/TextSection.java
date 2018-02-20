@@ -1,46 +1,31 @@
-/*
- * The MIT License
- *
- * Copyright (c) 2009-2011, Timothy Bingaman
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 package hudson.plugins.sectioned_view;
 
 import hudson.model.*;
-import javafx.beans.binding.BooleanExpression;
 import jenkins.model.Jenkins;
 import hudson.Extension;
 import hudson.util.EnumConverter;
+
+import javafx.beans.binding.BooleanExpression;
+
+
 import net.sf.json.JSONObject;
 
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+
+/* JavaScript Reverse proxy classes */
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
+
+/* Dependency plugins classes */
 import com.cloudbees.hudson.plugins.folder.Folder;
+import com.wangyin.parameter.WHideParameterDefinition;
+
 
 import javax.servlet.ServletException;
 import java.io.*;
 import java.util.*;
-import com.wangyin.parameter.WHideParameterDefinition;
 
 
 
@@ -159,7 +144,7 @@ public class TextSection extends SectionedViewSection {
 
         List<Item> itm = instance.getAllItems();
         for(Item item : itm){
-            if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
+            if(item instanceof Folder){
                 if(item.getDisplayName() == "MukeshSingal"){
 
                     return (Job) item;
@@ -177,7 +162,7 @@ public class TextSection extends SectionedViewSection {
 
         List<Item> itm = instance.getAllItems();
         for(Item item : itm){
-            if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
+            if(item instanceof Folder){
                 if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook/POST_BUILD").trim())){
                     System.out.println("POST_BUILD Folder Content ->");
 
@@ -212,8 +197,8 @@ public class TextSection extends SectionedViewSection {
         org.json.JSONObject hookPropertiesInJson = new org.json.JSONObject(hookProperties);
         printMsg("updateHookJob","hookPropertiesInJson", hookPropertiesInJson);
 
-        String isBlocking = hookPropertiesInJson.getString("isBlocking");
-        printMsg("updateHookJob","isBlocking", isBlocking);
+        String propogateBuildStatus = hookPropertiesInJson.getString("propogateBuildStatus");
+        printMsg("updateHookJob","propogateBuildStatus", propogateBuildStatus);
 
         String url = hookPropertiesInJson.getString("hookUrl");
         printMsg("updateHookJob","url", url);
@@ -229,13 +214,16 @@ public class TextSection extends SectionedViewSection {
         String buildAction = hookParametersInJson.getString("BUILD_ACTION");
         printMsg("updateHookJob","buildAction", buildAction);
 
+        String pipelineStage = hookParametersInJson.getString("PIPELINE_STAGE");
+        printMsg("updateHookJob","pipelineStage", pipelineStage);
+
         /* Parameters descriptions */
         String hookNameDesc             = "Name of Custom Hook. It must start with a letter, only contain letters and numbers and be between 4 and 17 characters long.";
         String buildStepDesc            = "Select one of the following phases where you want to inject custom hook.";
         String newHookNameDesc          = "Optional: Rename Custom Hook to new Custom Hook name.";
         String buildActionDesc          = "Optional: Type of hook you want to run.";
         String scriptArgumentDesc       = "Optional: Specify targets, goal or arguments for Hook. These args will be used while invoking Custon Hook scripts. In Ant - pass args like -DProjectName=ABC In Maven - Specify goals clean install ";
-        String isBlockingDesc           = "Optional: Block until the triggered Hooks finish their builds.";
+        String propogateBuildStatusDesc           = "Optional: Block until the triggered Hooks finish their builds.";
         String hookFileParameterDesc    = "Optional: Upload custom hook project zip. It must contain ant and maven script at root location.\n Currently only Ant and Maven hooks are being supported by AppFactory.";
 
         /* Put Hook Properties and Parameter in update job. */
@@ -243,7 +231,7 @@ public class TextSection extends SectionedViewSection {
         List<Item> items = instance.getAllItems();
 
         for(Item item : items){
-            if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
+            if(item instanceof Folder){
                 if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook").trim())){
                     Object[] jobsArray = item.getAllJobs().toArray();
                     for(Object job : jobsArray) {
@@ -252,6 +240,10 @@ public class TextSection extends SectionedViewSection {
                             /* Helpers to create default values in Choice Parameters */
                             StringParameterDefinition defaultBuildActionParameter = new StringParameterDefinition("XYZ", buildAction);
                             String[] buildActionChoices = {"Execute Ant", "Execute Maven"};
+
+                            /*Helper to create pipelineStage*/
+                            StringParameterDefinition defaultPipelineStageParameter = new StringParameterDefinition("defaultPipelineStage", pipelineStage);
+                            String[] pipelineStageChoices = {"ANDROID_STAGE", "IOS_STAGE", "IOS_IPA_STAGE", "SPA_STAGE"};
 
                             /* Create new parameter definitions with hook parameters and properties */
                             WHideParameterDefinition hookNameParameter = new WHideParameterDefinition("HOOK_NAME",hookName,hookNameDesc);
@@ -263,20 +255,24 @@ public class TextSection extends SectionedViewSection {
                             ChoiceParameterDefinition buildActionParameterWithoutDefaultValue = new ChoiceParameterDefinition( "BUILD_ACTION", buildActionChoices, buildActionDesc);
                             ParameterDefinition buildActionParameter = buildActionParameterWithoutDefaultValue.copyWithDefaultValue(defaultBuildActionParameter.getDefaultParameterValue());
 
+                            ChoiceParameterDefinition pipelineStageParameterWithoutDefaultValue = new ChoiceParameterDefinition( "PIPELINE_STAGE", pipelineStageChoices, buildActionDesc);
+                            ParameterDefinition pipelineStageParameter = pipelineStageParameterWithoutDefaultValue.copyWithDefaultValue(defaultPipelineStageParameter.getDefaultParameterValue());
+
                             StringParameterDefinition scriptArgumentsParameter = new StringParameterDefinition("SCRIPT_ARGUMENTS", scriptArgs, scriptArgumentDesc);
 
                             FileParameterDefinition hookFileParameter = new FileParameterDefinition("HOOK_ARCHIVE_FILE", hookFileParameterDesc);
 
-                            BooleanParameterDefinition isBlockingParameter = new BooleanParameterDefinition("IS_SYNCHRONOUS_CALL", Boolean.valueOf(isBlocking),isBlockingDesc);
+                            BooleanParameterDefinition propogateBuildStatusParameter = new BooleanParameterDefinition("PROPAGATE_BUILD_STATUS", Boolean.valueOf(propogateBuildStatus),propogateBuildStatusDesc);
 
                             ParameterDefinition[] newParameters = {
                                     hookNameParameter,
                                     buildStepParameter,
                                     newHookNameParameter,
                                     buildActionParameter,
+                                    pipelineStageParameter,
                                     scriptArgumentsParameter,
                                     hookFileParameter,
-                                    isBlockingParameter
+                                    propogateBuildStatusParameter
                             };
 
                             /* Remove old parameters from _updateHookJob*/
@@ -297,7 +293,7 @@ public class TextSection extends SectionedViewSection {
 
         List<Item> itm = instance.getAllItems();
         for(Item item : itm){
-            if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
+            if(item instanceof Folder){
                 if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook/"+state).trim())){
                     Object[] jobsArr = item.getAllJobs().toArray();
                     for(Object job : jobsArr) {
@@ -323,7 +319,7 @@ public class TextSection extends SectionedViewSection {
 
         List<Item> itm = instance.getAllItems();
         for(Item item : itm){
-            if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
+            if(item instanceof Folder){
                 if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook/PRE_BUILD").trim())){
                     System.out.println("PRE_BUILD Folder Content ->");
 
@@ -434,7 +430,7 @@ public class TextSection extends SectionedViewSection {
 
         List<Item> itm = instance.getAllItems();
         for(Item item : itm){
-            if(item instanceof com.cloudbees.hudson.plugins.folder.Folder){
+            if(item instanceof Folder){
                 if(item.getFullName().trim().equals((getName() +"/Visualizer/Builds/CustomHook/POST_TEST").trim())){
                     System.out.println("POST_TEST Folder Content ->");
 
