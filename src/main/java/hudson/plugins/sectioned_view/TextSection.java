@@ -192,8 +192,8 @@ public class TextSection extends SectionedViewSection {
         org.json.JSONObject hookPropertiesInJson = new org.json.JSONObject(hookProperties);
         printMsg("updateHookJob","hookPropertiesInJson", hookPropertiesInJson);
 
-        String propogateBuildStatus = hookPropertiesInJson.getString("propogateBuildStatus");
-        printMsg("updateHookJob","propogateBuildStatus", propogateBuildStatus);
+        String propagateBuildStatus = hookPropertiesInJson.getString("propagateBuildStatus");
+        printMsg("updateHookJob","propagateBuildStatus", propagateBuildStatus);
 
         String url = hookPropertiesInJson.getString("hookUrl");
         printMsg("updateHookJob","url", url);
@@ -218,7 +218,7 @@ public class TextSection extends SectionedViewSection {
         String newHookNameDesc          = "Optional: Rename Custom Hook to new Custom Hook name.";
         String buildActionDesc          = "Optional: Type of hook you want to run.";
         String scriptArgumentDesc       = "Optional: Specify targets, goal or arguments for Hook. These args will be used while invoking Custon Hook scripts. In Ant - pass args like -DProjectName=ABC In Maven - Specify goals clean install ";
-        String propogateBuildStatusDesc           = "Optional: Block until the triggered Hooks finish their builds.";
+        String propagateBuildStatusDesc           = "Optional: Block until the triggered Hooks finish their builds.";
         String hookFileParameterDesc    = "Optional: Upload custom hook project zip. It must contain ant and maven script at root location.\n Currently only Ant and Maven hooks are being supported by AppFactory.";
 
         /* Put Hook Properties and Parameter in update job. */
@@ -268,7 +268,7 @@ public class TextSection extends SectionedViewSection {
 
                             FileParameterDefinition hookFileParameter = new FileParameterDefinition("HOOK_ARCHIVE_FILE", hookFileParameterDesc);
 
-                            BooleanParameterDefinition propogateBuildStatusParameter = new BooleanParameterDefinition("PROPAGATE_BUILD_STATUS", Boolean.valueOf(propogateBuildStatus),propogateBuildStatusDesc);
+                            BooleanParameterDefinition propagateBuildStatusParameter = new BooleanParameterDefinition("PROPAGATE_BUILD_STATUS", Boolean.valueOf(propagateBuildStatus),propagateBuildStatusDesc);
 
                             ParameterDefinition[] newParameters = {
                                     hookNameParameter,
@@ -278,7 +278,7 @@ public class TextSection extends SectionedViewSection {
                                     pipelineStageParameter,
                                     scriptArgumentsParameter,
                                     hookFileParameter,
-                                    propogateBuildStatusParameter
+                                    propagateBuildStatusParameter
                             };
 
                             /* Remove old parameters from _updateHookJob*/
