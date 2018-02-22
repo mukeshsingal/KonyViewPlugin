@@ -1,16 +1,10 @@
 package hudson.plugins.sectioned_view;
 
+/* Jenkins utility classes */
 import hudson.model.*;
 import jenkins.model.Jenkins;
 import hudson.Extension;
 import hudson.util.EnumConverter;
-
-import javafx.beans.binding.BooleanExpression;
-
-
-import net.sf.json.JSONObject;
-
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
 /* JavaScript Reverse proxy classes */
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -21,12 +15,13 @@ import org.kohsuke.stapler.bind.JavaScriptMethod;
 /* Dependency plugins classes */
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.wangyin.parameter.WHideParameterDefinition;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
-
+/* Java utility classes */
 import javax.servlet.ServletException;
 import java.io.*;
 import java.util.*;
-
+import net.sf.json.JSONObject;
 
 
 public class TextSection extends SectionedViewSection {
@@ -243,7 +238,18 @@ public class TextSection extends SectionedViewSection {
 
                             /*Helper to create pipelineStage*/
                             StringParameterDefinition defaultPipelineStageParameter = new StringParameterDefinition("defaultPipelineStage", pipelineStage);
-                            String[] pipelineStageChoices = {"ANDROID_STAGE", "IOS_STAGE", "IOS_IPA_STAGE", "SPA_STAGE"};
+
+                            String[] pipelineStageChoices;
+
+                            if(hookStage.equals("PRE_BUILD")){
+                                pipelineStageChoices= new String[]{"ANDROID_STAGE", "IOS_STAGE", "IOS_IPA_STAGE", "SPA_STAGE"};
+                            }
+                            else if (hookStage.equals("POST_BUILD")){
+                                pipelineStageChoices = new String[]{"ANDROID_STAGE", "IOS_STAGE", "SPA_STAGE"};
+                            }
+                            else{
+                                pipelineStageChoices = new String[]{"ANDROID_STAGE", "IOS_STAGE"};
+                            }
 
                             /* Create new parameter definitions with hook parameters and properties */
                             WHideParameterDefinition hookNameParameter = new WHideParameterDefinition("HOOK_NAME",hookName,hookNameDesc);
