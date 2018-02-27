@@ -183,20 +183,103 @@ public class TextSection extends SectionedViewSection {
     }
 
     @JavaScriptMethod
+    public void onClickFillBuildStageInCreateHookJob(String hookStage) throws IOException {
+        /*Parameters to be created
+        *
+        * HOOK_NAME:                StringParameter
+        * BUILD_STEP:               Choice with Default with hookStage
+        * PIPELINE_STAGE:           Active Choice With Script Injected
+        * BUILD_ACTION:             choice
+        * SCRIPT_ARGUMENTS          String
+        * HOOK_ARCHIVE_FILE:        File
+        * PROPAGATE_BUILD_STATUS    Boolean
+        *
+        * */
+        final String hookNameDesc = "\tThe name of your new Custom Hook It must start with a letter, only contain letters and numbers and be between 4 and 17 characters long.";
+        final String buildStepDesc = "Select one of the following phases where you want to inject custom hook.";
+        final String pipelineStageDesc = "Select one of the following phases where you want to inject custom hook.";
+        final String buildActionDesc = "\tType of hook you want to run. ";
+        final String scriptArgumentDesc = "\tSpecify targets, goal or arguments for Hook. These args will be used while invoking Custon Hook scripts. In Ant - pass args like -DProjectName=ABC In Maven - Specify goals clean install ";
+        final String hookArchiveDesc = "\tUpload custom hook project zip. It must contain ant and maven script at root location. Currently only Ant and Maven hooks are being supported by appfactory. ";
+        final String propagateBuildStatusDesc = "\tFail the entire Visualizer build if the hook execution fails.";
+
+
+        /* Put Hook Properties and Parameter in update job. */
+        Jenkins instance = Jenkins.getInstance();
+        List<Item> items = instance.getAllItems();
+
+        final String pipelineAllStage = "ALL";
+        final String pipelineAndroidStage = "ANDROID_STAGE";
+        final String pipelineIosStage = "IOS_STAGE";
+        final String pipelineIosIpaStage = "IOS_IPA_STAGE";
+        final String pipelineSpaStage = "SPA_STAGE";
+
+        String[] buildActionChoices = {"Execute Ant", "Execute Maven"};
+
+        String[] pipelineStageChoices;
+
+        if(hookStage.equals("PRE_BUILD")){
+            pipelineStageChoices = new String[]{ pipelineAllStage, pipelineAndroidStage, pipelineIosStage, pipelineIosIpaStage, pipelineSpaStage};
+        }else if (hookStage.equals("POST_BUILD")){
+            pipelineStageChoices = new String[]{ pipelineAllStage, pipelineAndroidStage, pipelineIosStage, pipelineSpaStage};
+        }else{
+            pipelineStageChoices = new String[]{ pipelineAllStage, pipelineAndroidStage, pipelineIosStage};
+        }
+
+        /*parameter Description*/
+        StringParameterDefinition hookNameParameter = new StringParameterDefinition("HOOK_NAME","", hookNameDesc);
+        WHideParameterDefinition buildStepParameter = new WHideParameterDefinition("BUILD_STEP",hookStage+"_STEP", buildStepDesc);
+        ChoiceParameterDefinition pipelineStageParameter = new ChoiceParameterDefinition("PIPELINE_STAGE", pipelineStageChoices, pipelineStageDesc );
+        ChoiceParameterDefinition buildActionParameter = new ChoiceParameterDefinition("BUILD_ACTION",buildActionChoices, buildActionDesc);
+        StringParameterDefinition scriptArgumentParameter = new StringParameterDefinition("SCRIPT_ARGUMENTS", "", scriptArgumentDesc);
+        FileParameterDefinition hookArchiveParameter = new FileParameterDefinition("HOOK_ARCHIVE_FILE", hookArchiveDesc);
+        BooleanParameterDefinition propagateBuildStatusParameter = new BooleanParameterDefinition("PROPAGATE_BUILD_STATUS", true,  propagateBuildStatusDesc);
+
+        for(Item item : items) {
+            if (item instanceof Folder) {
+                if (item.getFullName().trim().equals((getName() + "/Visualizer/Builds/CustomHook").trim())) {
+                    Object[] jobsArray = item.getAllJobs().toArray();
+                    for (Object job : jobsArray) {
+                        if (((Job) job).getDisplayName().equals("_createCustomHook")) {
+                            ParameterDefinition[] newParameters = {
+                                    hookNameParameter,
+                                    buildStepParameter,
+                                    pipelineStageParameter,
+                                    buildActionParameter,
+                                    scriptArgumentParameter,
+                                    hookArchiveParameter,
+                                    propagateBuildStatusParameter
+                            };
+
+                            /* Remove old parameters from _updateHookJob*/
+                            ((Job) job).removeProperty(ParametersDefinitionProperty.class);
+                            /* Add new Parameters to _updateHookJob*/
+                            ((Job) job).addProperty(new ParametersDefinitionProperty(newParameters));
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    @JavaScriptMethod
     public void updateHookJob(String hookName, String hookStage) throws IOException {
         /* Get hook properties */
+        final String functionName = "updateHookJob";
+
         System.out.println("\n\nupdateHookJob: ->");
         String hookProperties = getConfigFileHelper().getHookFromConfigs(getName(), hookName, hookStage);
-        printMsg("updateHookJob","hookProperties", hookProperties);
+        printMsg(functionName,"hookProperties", hookProperties);
 
         org.json.JSONObject hookPropertiesInJson = new org.json.JSONObject(hookProperties);
-        printMsg("updateHookJob","hookPropertiesInJson", hookPropertiesInJson);
+        printMsg(functionName,"hookPropertiesInJson", hookPropertiesInJson);
 
         String propagateBuildStatus = hookPropertiesInJson.getString("propagateBuildStatus");
-        printMsg("updateHookJob","propagateBuildStatus", propagateBuildStatus);
+        printMsg(functionName,"propagateBuildStatus", propagateBuildStatus);
 
         String url = hookPropertiesInJson.getString("hookUrl");
-        printMsg("updateHookJob","url", url);
+        printMsg(functionName,"url", url);
 
 
         /* Read hookParameters from Config */
@@ -204,13 +287,13 @@ public class TextSection extends SectionedViewSection {
         org.json.JSONObject hookParametersInJson = new org.json.JSONObject(parameters);
 
         String scriptArgs = hookParametersInJson.getString("SCRIPT_ARGUMENTS");
-        printMsg("updateHookJob","scriptArgs", scriptArgs);
+        printMsg(functionName,"scriptArgs", scriptArgs);
 
         String buildAction = hookParametersInJson.getString("BUILD_ACTION");
-        printMsg("updateHookJob","buildAction", buildAction);
+        printMsg(functionName,"buildAction", buildAction);
 
         String pipelineStage = hookParametersInJson.getString("PIPELINE_STAGE");
-        printMsg("updateHookJob","pipelineStage", pipelineStage);
+        printMsg(functionName,"pipelineStage", pipelineStage);
 
         /* Parameters descriptions */
         String hookNameDesc             = "Name of Custom Hook. It must start with a letter, only contain letters and numbers and be between 4 and 17 characters long.";
@@ -220,6 +303,12 @@ public class TextSection extends SectionedViewSection {
         String scriptArgumentDesc       = "Optional: Specify targets, goal or arguments for Hook. These args will be used while invoking Custon Hook scripts. In Ant - pass args like -DProjectName=ABC In Maven - Specify goals clean install ";
         String propagateBuildStatusDesc           = "Optional: Block until the triggered Hooks finish their builds.";
         String hookFileParameterDesc    = "Optional: Upload custom hook project zip. It must contain ant and maven script at root location.\n Currently only Ant and Maven hooks are being supported by AppFactory.";
+
+        final String pipelineAllStage = "ALL";
+        final String pipelineAndroidStage = "ANDROID_STAGE";
+        final String pipelineIosStage = "IOS_STAGE";
+        final String pipelineIosIpaStage = "IOS_IPA_STAGE";
+        final String pipelineSpaStage = "SPA_STAGE";
 
         /* Put Hook Properties and Parameter in update job. */
         Jenkins instance = Jenkins.getInstance();
@@ -242,13 +331,13 @@ public class TextSection extends SectionedViewSection {
                             String[] pipelineStageChoices;
 
                             if(hookStage.equals("PRE_BUILD")){
-                                pipelineStageChoices= new String[]{"ANDROID_STAGE", "IOS_STAGE", "IOS_IPA_STAGE", "SPA_STAGE"};
+                                pipelineStageChoices= new String[]{pipelineAllStage, pipelineAndroidStage, pipelineIosStage, pipelineIosIpaStage, pipelineSpaStage};
                             }
                             else if (hookStage.equals("POST_BUILD")){
-                                pipelineStageChoices = new String[]{"ANDROID_STAGE", "IOS_STAGE", "SPA_STAGE"};
+                                pipelineStageChoices = new String[]{pipelineAllStage, pipelineAndroidStage, pipelineIosStage, pipelineSpaStage};
                             }
                             else{
-                                pipelineStageChoices = new String[]{"ANDROID_STAGE", "IOS_STAGE"};
+                                pipelineStageChoices = new String[]{pipelineAllStage, pipelineAndroidStage, pipelineIosStage};
                             }
 
                             /* Create new parameter definitions with hook parameters and properties */

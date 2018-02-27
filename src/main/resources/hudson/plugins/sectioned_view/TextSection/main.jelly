@@ -119,6 +119,15 @@ THE SOFTWARE.
         function undoDeleteHook(){
           $(".tempDeleteClass").removeClass("tempDeleteClass")
         }
+
+        function onClickFillBuildStageInCreateHookJob(hookStage, url){
+          console.info(hookStage)
+          console.info(url)
+          foo.onClickFillBuildStageInCreateHookJob(hookStage, function(t) {
+            window.location.href = url
+          })
+        }
+
       </script>
       <script>
         crumb.init("${h.getCrumbRequestField()}", "${h.getCrumb(request)}");
@@ -127,9 +136,9 @@ THE SOFTWARE.
          console.info(url)
          console.info(hookName)
 
-          foo.updateHookJob(hookName, hookStage)
-          window.location.href = url
-
+          foo.updateHookJob(hookName, hookStage, function(t) {
+            window.location.href = url
+          })
         }
       </script>
     </head>
@@ -202,7 +211,7 @@ THE SOFTWARE.
                       <div class="hook-point-container" style="width: 265px">
                         <div class="hook-header">
                           <span class="label-header" >Hook Point PreBuild</span>
-                          <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/">
+                          <a onclick="onClickFillBuildStageInCreateHookJob('PRE_BUILD','${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/')">
                             <button type="button" class="btn btn-upload show-modal" data-toggle="modal">Upload</button>
                           </a>
                         </div>
@@ -277,7 +286,7 @@ THE SOFTWARE.
                       <div class="hook-point-container" style="width: 265px">
                         <div class="hook-header">
                           <span class="label-header">Hook Point PostBuild</span>
-                          <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/">
+                          <a  onclick="onClickFillBuildStageInCreateHookJob('POST_BUILD', '${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/')">
                           <button type="button" class="btn btn-upload show-modal">Upload</button>
                           </a>
                         </div>
@@ -342,7 +351,7 @@ THE SOFTWARE.
                       <div class="hook-point-container" style="width: 265px">
                         <div class="hook-header">
                           <span class="label-header">Hook Point PostTest</span>
-                          <a href="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/">
+                          <a onclick="onClickFillBuildStageInCreateHookJob('POST_TEST', '${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/_createCustomHook/build/')">
                           <button type="button" class="btn btn-upload show-modal">Upload</button>
                           </a>
                         </div>
