@@ -16,6 +16,7 @@ import org.kohsuke.stapler.bind.JavaScriptMethod;
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.wangyin.parameter.WHideParameterDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import hudson.plugins.validating_string_parameter.ValidatingStringParameterDefinition;
 
 /* Java utility classes */
 import javax.servlet.ServletException;
@@ -195,7 +196,7 @@ public class TextSection extends SectionedViewSection {
         * PROPAGATE_BUILD_STATUS    Boolean
         *
         * */
-        final String hookNameDesc = "\tThe name of your new Custom Hook It must start with a letter, only contain letters and numbers and be between 4 and 17 characters long.";
+        final String hookNameDesc = "The name of your new Custom Hook It must start with a letter, only contain letters and numbers and be between 4 and 17 characters long.";
         final String buildStepDesc = "Select one of the following phases where you want to inject custom hook.";
         final String pipelineStageDesc = "Select one of the following phases where you want to inject custom hook.";
         final String buildActionDesc = "\tType of hook you want to run. ";
@@ -227,7 +228,11 @@ public class TextSection extends SectionedViewSection {
         }
 
         /*parameter Description*/
-        StringParameterDefinition hookNameParameter = new StringParameterDefinition("HOOK_NAME","", hookNameDesc);
+//        StringParameterDefinition hookNameParameter = new StringParameterDefinition("HOOK_NAME","", hookNameDesc);
+        String failedValidationMassage = "Please enter valid hook name.";
+        String hookValidationRegex = "^[a-zA-Z][A-Za-z0-9]{3,16}$";
+
+        ValidatingStringParameterDefinition hookNameParameter = new ValidatingStringParameterDefinition("HOOK_NAME","",hookValidationRegex,failedValidationMassage, hookNameDesc);
         WHideParameterDefinition buildStepParameter = new WHideParameterDefinition("BUILD_STEP",hookStage+"_STEP", buildStepDesc);
         ChoiceParameterDefinition pipelineStageParameter = new ChoiceParameterDefinition("PIPELINE_STAGE", pipelineStageChoices, pipelineStageDesc );
         ChoiceParameterDefinition buildActionParameter = new ChoiceParameterDefinition("BUILD_ACTION",buildActionChoices, buildActionDesc);
@@ -345,7 +350,11 @@ public class TextSection extends SectionedViewSection {
 
                             WHideParameterDefinition buildStepParameter = new WHideParameterDefinition("BUILD_STEP",hookStage+"_STEP",buildStepDesc);
 
-                            StringParameterDefinition newHookNameParameter = new StringParameterDefinition("NEW_HOOK_NAME", hookName,newHookNameDesc );
+                            //StringParameterDefinition newHookNameParameter = new StringParameterDefinition("NEW_HOOK_NAME", hookName,newHookNameDesc );
+                            String failedValidationMassage = "Please enter valid hook name.";
+                            String hookValidationRegex = "^[a-zA-Z][A-Za-z0-9]{3,16}$";
+
+                            ValidatingStringParameterDefinition newHookNameParameter = new ValidatingStringParameterDefinition("NEW_HOOK_NAME",hookName,hookValidationRegex,failedValidationMassage, newHookNameDesc);
 
                             ChoiceParameterDefinition buildActionParameterWithoutDefaultValue = new ChoiceParameterDefinition( "BUILD_ACTION", buildActionChoices, buildActionDesc);
                             ParameterDefinition buildActionParameter = buildActionParameterWithoutDefaultValue.copyWithDefaultValue(defaultBuildActionParameter.getDefaultParameterValue());
