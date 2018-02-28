@@ -94,7 +94,8 @@ THE SOFTWARE.
                                   if(status == "false"){
                                    $(val).parent().parent().parent().addClass("disabled");
                                     $(val).parent().siblings('.action-icons').children('.icon-set').addClass('d-none');
-                                    $(val).parent().siblings('.action-icons').children('.icon-set').removeClass('icon-set');
+                                    <!--$(val).parent().siblings('.action-icons').children('.icon-set').removeClass('icon-set');-->
+                                    $(val).parent().siblings('.action-icons').children('.icon-set').children().addClass('d-none');
                                     $(val).parent().siblings('.action-icons').children('.icon-disable-set').removeClass('d-none');
                                     console.info(name + " - >"+ val);
                                   }
@@ -312,7 +313,7 @@ THE SOFTWARE.
                                   <span class="icon-disable-set d-none">
                                     <j:set var="enableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_BUILD/job/${hook}/enable"/>
                                     <j:set var="enableHook" value="javascript:new Ajax.Request('${enableRequest}', {method: 'post'});"/>
-                                    <a onclick="${enableHook}">
+                                    <a onclick="enableHook('${hook}', 'POST_BUILD')">
                                       <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
                                     </a>
 
@@ -377,7 +378,7 @@ THE SOFTWARE.
                                     <span class="icon-disable-set d-none">
                                       <j:set var="postTestEnableRequest" value="${rootURL}/job/${app.markupFormatter.translate(section.name)}/job/Visualizer/job/Builds/job/CustomHook/job/POST_TEST/job/${hook}/enable"/>
                                       <j:set var="postTestEnableHook" value="javascript:new Ajax.Request('${postTestEnableRequest}', {method: 'post'});"/>
-                                      <a onclick="${postTestEnableHook}">
+                                      <a onclick="enableHook('${hook}', 'POST_TEST')">
                                         <i class="icon16 icon-reset-hook v-middle mr-5 di-block"></i>
                                       </a>
 

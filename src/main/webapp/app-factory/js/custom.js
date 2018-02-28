@@ -23,6 +23,7 @@ $('.hook-edit input').on('focus',function(){
 $('.icon-disable-hook').on('click',function(e){
     var findParent = $(e.target).parents('.normal-state');
     findParent.find('.icon-disable-set').removeClass('d-none');
+    findParent.find('.icon-disable-set').children().removeClass('d-none');
     $(this).parent().removeClass('icon-set').addClass('d-none');
     $(this).parents('.ui-state-default').addClass('disabled').removeClass('active');
 })
@@ -68,6 +69,8 @@ $('.icon-reset-hook').on('click',function(e){
     $(this).parent().addClass('d-none');
     $(this).parent().prev().addClass('icon-set').addClass('d-none');
     $(this).parents('.ui-state-default').removeClass('disabled').addClass('active');
+    $(this).parent().siblings('a').addClass('d-none');
+    $(this).parents('.icon-disable-set').siblings('.icon-set').children().removeClass('d-none');
 })
 $('.icon-delete-hook').on('click',function(e){
     var fintParent = $(e.target).parents('.hook-point-container');
