@@ -17,6 +17,7 @@ import com.cloudbees.hudson.plugins.folder.Folder;
 import com.wangyin.parameter.WHideParameterDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import hudson.plugins.validating_string_parameter.ValidatingStringParameterDefinition;
+import hudson.plugins.sectioned_view.Helpers.S3Helper;
 
 /* Java utility classes */
 import javax.servlet.ServletException;
@@ -514,17 +515,20 @@ public class TextSection extends SectionedViewSection {
     public void deleteHook(String hookName, String stage) throws Throwable {
         System.out.println("Delete  Hook - " + hookName );
         Item job = Jenkins.getInstance().getItemByFullName(getName() +"/Visualizer/Builds/CustomHook/"+stage+"/"+hookName);
+        String keyValue= getName()+"/CustomHook/"+stage+"_STEP/"+job.getDisplayName()+"/1/Hook.zip";
 
         if(job instanceof hudson.model.FreeStyleProject){
             System.out.println("--Set Delete Invoked for FS--");
             job.delete();
             getConfigFileHelper().deleteHookInJson(getName(),getName(),job.getDisplayName(),stage);
+            S3Helper.deleteHooksFromS3(keyValue);
         }
 
         if(job instanceof org.jenkinsci.plugins.workflow.job.WorkflowJob){
             System.out.println("--Set delete Invoked for pipeline--");
             job.delete();
             getConfigFileHelper().deleteHookInJson(getName(),getName(),job.getDisplayName(),stage);
+            S3Helper.deleteHooksFromS3(keyValue);
         }
     }
 
