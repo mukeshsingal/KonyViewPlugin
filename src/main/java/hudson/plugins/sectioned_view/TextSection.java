@@ -27,6 +27,7 @@ import net.sf.json.JSONObject;
 
 
 public class TextSection extends SectionedViewSection {
+    String customhooksConfigFolder = getName() + "/Visualizer/Builds/CustomHook";
     public List<String> hooks;
     List<String> hookList = new ArrayList<>();
 
@@ -584,7 +585,6 @@ public class TextSection extends SectionedViewSection {
         public String getName() {
             return name();
         }
-
 
         Style(String description, String cssClass) {
             this.description = description;

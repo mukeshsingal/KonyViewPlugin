@@ -33,21 +33,21 @@ public class ConfigFileHelper {
         }
     }
 
-    void createConfigFile(String folderName, String fileId, List<String> content, String stage) throws IOException {
-        Item folderObject = getFolderObject(folderName);
+    void createConfigFile(String projectName, String fileId, List<String> content, String stage) throws IOException {
+        Item folderObject = getFolderObject(getcustomhooksConfigFolder(projectName));
         FolderConfigFileProperty folderConfigFilesObject = getConfigPropertyObject(folderObject);
         Collection<Config> availableConfigs = getAvailableConfigs(folderConfigFilesObject);
         createConfig(fileId, stage, content, folderConfigFilesObject, availableConfigs);
     }
 
-    String getParametersOfHookFromConfigs(String folderName, String hookName, String stage) throws IOException {
+    String getParametersOfHookFromConfigs(String projectName, String hookName, String stage) throws IOException {
 
         JSONObject hookParameters = null;
 
-        Item folderObject = getFolderObject(folderName);
+        Item folderObject = getFolderObject(getcustomhooksConfigFolder(projectName));
         FolderConfigFileProperty folderConfigFilesObject = getConfigPropertyObject(folderObject);
         Collection<Config> availableConfigs = getAvailableConfigs(folderConfigFilesObject);
-        String olderContent = getConfigFileContent(folderName, availableConfigs);
+        String olderContent = getConfigFileContent(projectName, availableConfigs);
         JSONObject root = new JSONObject(olderContent);
 
         JSONArray oldHooksProperties  = root.getJSONArray(stage);
@@ -71,19 +71,19 @@ public class ConfigFileHelper {
     }
 
     /**
-     * @param folderName name of project
+     * @param projectName name of project
      * @param hookName name of hook
      * @param hookStage stage of hook
      * @return Object of hook properties
      */
-    String getHookFromConfigs(String folderName, String hookName, String hookStage) throws IOException {
+    String getHookFromConfigs(String projectName, String hookName, String hookStage) throws IOException {
 
         JSONObject hookProperties = null;
 
-        Item folderObject = getFolderObject(folderName);
+        Item folderObject = getFolderObject(getcustomhooksConfigFolder(projectName));
         FolderConfigFileProperty folderConfigFilesObject = getConfigPropertyObject(folderObject);
         Collection<Config> availableConfigs = getAvailableConfigs(folderConfigFilesObject);
-        String olderContent = getConfigFileContent(folderName, availableConfigs);
+        String olderContent = getConfigFileContent(projectName, availableConfigs);
         JSONObject root = new JSONObject(olderContent);
 
         JSONArray oldHooksProperties  = root.getJSONArray(hookStage);
@@ -110,7 +110,7 @@ public class ConfigFileHelper {
 
     void updateStatusOfHook(String projectName,String fileId, String hookName, String stage, String status) throws IOException{
         /* configFileName is same as hookName */
-        Item folderObject = getFolderObject(projectName);
+        Item folderObject = getFolderObject(getcustomhooksConfigFolder(projectName));
         FolderConfigFileProperty folderConfigFilesObject = getConfigPropertyObject(folderObject);
         Collection<Config> availableConfigs = getAvailableConfigs(folderConfigFilesObject);
         updateStatus(fileId, stage, hookName, status, folderConfigFilesObject, availableConfigs);
@@ -118,7 +118,7 @@ public class ConfigFileHelper {
     }
     void deleteHookInJson(String projectName,String fileId, String hookName, String stage) throws IOException{
         /* configFileName is same as hookName */
-        Item folderObject = getFolderObject(projectName);
+        Item folderObject = getFolderObject(getcustomhooksConfigFolder(projectName));
         FolderConfigFileProperty folderConfigFilesObject = getConfigPropertyObject(folderObject);
         Collection<Config> availableConfigs = getAvailableConfigs(folderConfigFilesObject);
         deleteHook(fileId, stage, hookName, folderConfigFilesObject, availableConfigs);
@@ -180,7 +180,7 @@ public class ConfigFileHelper {
     we need to get Folder object where we want to store devices list first.
     */
     Item getFolderObject(String folderName) {
-        Item folderObject = Jenkins.getInstance().getItem(folderName);
+        Item folderObject = Jenkins.getInstance().getItemByFullName(folderName);
         printMsg("getFolderObject", "folderObject", folderObject);
         return folderObject;
     }
@@ -280,8 +280,9 @@ public class ConfigFileHelper {
         printMsg("getConfigFileContent", "olderContent", olderContent);
         return olderContent;
     }
-
-
+    String getcustomhooksConfigFolder(String projectName) {
+        return  projectName + "/Visualizer/Builds/CustomHook";
+    }
 }
 
 
